@@ -1,0 +1,176 @@
+{
+    "Apply":  false,
+    "UpstreamUrl":  "https://github.com/chdnl0420-svg/Harness",
+    "Branch":  "main",
+    "UpstreamCommit":  "98d1289129e73b6aaf732d5427eed0fdd01e80de",
+    "SourceHarness":  "C:\\Users\\NX3GAMES\\AppData\\Local\\Temp\\codex-harness-upstream-20260521-164318\\skills\\harness",
+    "HarnessDir":  "C:\\Users\\NX3GAMES\\Documents\\Obsidian Vault\\Harness\\skills\\harness",
+    "Applied":  [
+
+                ],
+    "Planned":  [
+
+                ],
+    "Skipped":  [
+                    {
+                        "Path":  "templates/doc-architecture.md",
+                        "Reason":  "Already current"
+                    },
+                    {
+                        "Path":  "templates/doc-prd.md",
+                        "Reason":  "Already current"
+                    },
+                    {
+                        "Path":  "templates/doc-ui-guide.md",
+                        "Reason":  "Already current"
+                    },
+                    {
+                        "Path":  "templates/improvement.md",
+                        "Reason":  "Already current"
+                    }
+                ],
+    "NeedsManualPort":  [
+                            {
+                                "Path":  ".gitattributes",
+                                "Reason":  "Codex-owned metadata or entrypoint"
+                            },
+                            {
+                                "Path":  ".version",
+                                "Reason":  "Codex-owned metadata or entrypoint"
+                            },
+                            {
+                                "Path":  "SKILL.md",
+                                "Reason":  "Codex-owned metadata or entrypoint"
+                            },
+                            {
+                                "Path":  "agents/codex-reviewer.md",
+                                "Reason":  "Codex-specific workflow surface; manual port required"
+                            },
+                            {
+                                "Path":  "agents/harness-customer-user.md",
+                                "Reason":  "Codex-specific workflow surface; manual port required"
+                            },
+                            {
+                                "Path":  "agents/harness-deep-researcher.md",
+                                "Reason":  "Codex-specific workflow surface; manual port required"
+                            },
+                            {
+                                "Path":  "agents/harness-qa-engineer.md",
+                                "Reason":  "Codex-specific workflow surface; manual port required"
+                            },
+                            {
+                                "Path":  "agents/learning/harness-customer-user.md",
+                                "Reason":  "Codex-specific workflow surface; manual port required"
+                            },
+                            {
+                                "Path":  "agents/learning/harness-deep-researcher.md",
+                                "Reason":  "Codex-specific workflow surface; manual port required"
+                            },
+                            {
+                                "Path":  "agents/learning/harness-qa-engineer.md",
+                                "Reason":  "Codex-specific workflow surface; manual port required"
+                            },
+                            {
+                                "Path":  "agents/learning/README.md",
+                                "Reason":  "Codex-specific workflow surface; manual port required"
+                            },
+                            {
+                                "Path":  "core/bootstrap-runtime.sh",
+                                "Reason":  "Codex-specific workflow surface; manual port required"
+                            },
+                            {
+                                "Path":  "docs/donot.md",
+                                "Reason":  "Codex policy document; manual port required"
+                            },
+                            {
+                                "Path":  "docs/html-output-rule.md",
+                                "Reason":  "Codex policy document; manual port required"
+                            },
+                            {
+                                "Path":  "docs/test-guide-format.md",
+                                "Reason":  "Contains non-Codex marker: 메인 Claude"
+                            },
+                            {
+                                "Path":  "docs/workflow.md",
+                                "Reason":  "Codex policy document; manual port required"
+                            },
+                            {
+                                "Path":  "docs/procedures/codex-review-procedure.md",
+                                "Reason":  "Codex-specific workflow surface; manual port required"
+                            },
+                            {
+                                "Path":  "docs/procedures/customer-test-procedure.md",
+                                "Reason":  "Codex-specific workflow surface; manual port required"
+                            },
+                            {
+                                "Path":  "docs/procedures/deep-research-procedure.md",
+                                "Reason":  "Codex-specific workflow surface; manual port required"
+                            },
+                            {
+                                "Path":  "docs/steps/complete.md",
+                                "Reason":  "Codex-specific workflow surface; manual port required"
+                            },
+                            {
+                                "Path":  "docs/steps/step1-init.md",
+                                "Reason":  "Codex-specific workflow surface; manual port required"
+                            },
+                            {
+                                "Path":  "docs/steps/step2-domain.md",
+                                "Reason":  "Codex-specific workflow surface; manual port required"
+                            },
+                            {
+                                "Path":  "docs/steps/step3-impl-plan.md",
+                                "Reason":  "Codex-specific workflow surface; manual port required"
+                            },
+                            {
+                                "Path":  "docs/steps/step4-impl.md",
+                                "Reason":  "Codex-specific workflow surface; manual port required"
+                            },
+                            {
+                                "Path":  "docs/steps/step5-review.md",
+                                "Reason":  "Codex-specific workflow surface; manual port required"
+                            },
+                            {
+                                "Path":  "docs/steps/step6-qa.md",
+                                "Reason":  "Codex-specific workflow surface; manual port required"
+                            },
+                            {
+                                "Path":  "docs/steps/step7-customer.md",
+                                "Reason":  "Codex-specific workflow surface; manual port required"
+                            },
+                            {
+                                "Path":  "docs/steps/step8-commit.md",
+                                "Reason":  "Codex-specific workflow surface; manual port required"
+                            },
+                            {
+                                "Path":  "templates/doc-adr.md",
+                                "Reason":  "Contains non-Codex marker: Phase 1.5"
+                            },
+                            {
+                                "Path":  "templates/learning-proposal.md",
+                                "Reason":  "Contains non-Codex marker: 메인 Claude"
+                            },
+                            {
+                                "Path":  "templates/plan.md",
+                                "Reason":  "No automatic Codex port rule"
+                            },
+                            {
+                                "Path":  "templates/progress.md",
+                                "Reason":  "No automatic Codex port rule"
+                            },
+                            {
+                                "Path":  "templates/project-claude.md",
+                                "Reason":  "Project instruction template differs by runtime"
+                            },
+                            {
+                                "Path":  "templates/result.md",
+                                "Reason":  "No automatic Codex port rule"
+                            },
+                            {
+                                "Path":  "templates/review.md",
+                                "Reason":  "No automatic Codex port rule"
+                            }
+                        ],
+    "ReportPath":  "C:\\Users\\NX3GAMES\\Documents\\Obsidian Vault\\Harness\\harness-update-reports\\sync-20260521-164318.json",
+    "BackupRoot":  ""
+}
