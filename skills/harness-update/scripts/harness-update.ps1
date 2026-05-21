@@ -31,6 +31,13 @@ $managedSkillNames = @(
     "harness-customer-user"
 )
 
+$scriptRoot = if ([string]::IsNullOrWhiteSpace($PSScriptRoot)) {
+    Split-Path -Parent $MyInvocation.MyCommand.Path
+} else {
+    $PSScriptRoot
+}
+$skillRoot = Split-Path -Parent $scriptRoot
+
 function Write-Utf8NoBom {
     param(
         [Parameter(Mandatory=$true)][string]$Path,
@@ -327,6 +334,67 @@ function Copy-Directory {
     Copy-Item -LiteralPath $Source -Destination $Destination -Recurse -Force
 }
 
+function Apply-CodexOverlays {
+    param(
+        [Parameter(Mandatory=$true)][string]$StageRoot,
+        [Parameter(Mandatory=$true)][string]$SkillRoot
+    )
+
+    $manifestPath = Join-Path $SkillRoot "overlays/manifest.json"
+    $applied = New-Object System.Collections.Generic.List[object]
+    if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) {
+        return $applied
+    }
+
+    $manifest = Get-Content -Raw -LiteralPath $manifestPath -Encoding UTF8 | ConvertFrom-Json
+    foreach ($entry in $manifest.overlays) {
+        $action = [string]($entry.action)
+        $targetRel = [string]($entry.target)
+        $sourceRel = [string]($entry.source)
+        $marker = [string]($entry.marker)
+
+        if ($action -ne "append") {
+            throw "Unsupported overlay action: $action"
+        }
+
+        $target = Join-Path $StageRoot $targetRel
+        $source = Join-Path $SkillRoot $sourceRel
+        if (-not (Test-Path -LiteralPath $target -PathType Leaf)) {
+            throw "Overlay target missing: $targetRel"
+        }
+        if (-not (Test-Path -LiteralPath $source -PathType Leaf)) {
+            throw "Overlay source missing: $sourceRel"
+        }
+
+        if ([string]::IsNullOrWhiteSpace($marker)) {
+            throw "Overlay marker missing for target: $targetRel"
+        }
+
+        $targetText = Read-PortableText $target
+        $overlayText = Read-PortableText $source
+        $start = "<!-- codex-overlay:${marker}:start -->"
+        $end = "<!-- codex-overlay:${marker}:end -->"
+        $block = $start + [Environment]::NewLine + $overlayText.Trim() + [Environment]::NewLine + $end
+
+        $pattern = [regex]::Escape($start) + "(?s).*?" + [regex]::Escape($end)
+        if ($targetText -match $pattern) {
+            $targetText = [regex]::Replace($targetText, $pattern, [System.Text.RegularExpressions.MatchEvaluator]{ param($m) $block })
+        } else {
+            $targetText = $targetText.TrimEnd() + [Environment]::NewLine + [Environment]::NewLine + $block + [Environment]::NewLine
+        }
+
+        Write-Utf8NoBom -Path $target -Text $targetText
+        $applied.Add([pscustomobject]@{
+            target = $targetRel
+            source = $sourceRel
+            marker = $marker
+            action = $action
+        }) | Out-Null
+    }
+
+    return $applied
+}
+
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
     throw "git is required for /harness-update."
 }
@@ -339,6 +407,7 @@ $reportRoot = Join-Path $codexHomeFull "harness-update-reports"
 $backupRoot = Join-Path (Join-Path $codexHomeFull "harness-update-backups") $stamp
 $records = New-Object System.Collections.Generic.List[object]
 $excluded = New-Object System.Collections.Generic.List[object]
+$overlayRecords = New-Object System.Collections.Generic.List[object]
 
 try {
     New-Item -ItemType Directory -Force -Path $stageRoot, $reportRoot | Out-Null
@@ -403,6 +472,8 @@ try {
 
     Write-Utf8NoBom -Path (Join-Path $stageRoot "harness/core/bootstrap-runtime.sh") -Text (Get-CustomBootstrap)
     Add-Record -List $records -Category "port-required" -Source "skills/harness/core/bootstrap-runtime.sh" -Destination "harness/core/bootstrap-runtime.sh" -Action "custom-codex-port" -Reason "Limit runtime bootstrap to .harness output dirs and AGENTS.md seed."
+
+    $overlayRecords = Apply-CodexOverlays -StageRoot $stageRoot -SkillRoot $skillRoot
 
     $allUpstream = Get-ChildItem -LiteralPath $cloneRoot -Recurse -File |
         Where-Object { $_.FullName -notmatch "\\.git\\" } |
@@ -493,12 +564,14 @@ try {
             exact_copy = @($records | Where-Object { $_.category -eq "exact-copy" }).Count
             minimal_codex_port = @($records | Where-Object { $_.category -eq "minimal-codex-port" }).Count
             port_required = @($records | Where-Object { $_.category -eq "port-required" }).Count
+            codex_overlays = $overlayRecords.Count
             excluded = $excluded.Count
             forbidden_hits = $forbidden.Count
             broken_links = $brokenLinks.Count
         }
         bash_n_bootstrap = $bashCheck
         installed_skill_names = $managedSkillNames
+        codex_overlays = $overlayRecords
         installed = $records
         excluded = $excluded
     }
@@ -511,6 +584,7 @@ try {
     Write-Output "exact_copy=$($report.counts.exact_copy)"
     Write-Output "minimal_codex_port=$($report.counts.minimal_codex_port)"
     Write-Output "port_required=$($report.counts.port_required)"
+    Write-Output "codex_overlays=$($report.counts.codex_overlays)"
     Write-Output "excluded=$($report.counts.excluded)"
     Write-Output "forbidden_hits=$($report.counts.forbidden_hits)"
     Write-Output "broken_links=$($report.counts.broken_links)"

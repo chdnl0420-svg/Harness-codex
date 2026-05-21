@@ -32,6 +32,19 @@ Default behavior:
 - Do not install Claude Code `commands/`, user-level `agents/`, root `README.md`, upstream `.version`, or `.gitattributes`.
 - Write reports to `$CODEX_HOME/harness-update-reports/`.
 
+## Persistent Codex Overlays
+
+Codex-only corrections that must survive future upstream updates live under `overlays/`.
+
+- `overlays/manifest.json` lists generated target files and overlay snippets.
+- The script applies overlays after upstream classification/porting and before validation.
+- Use overlays for local Codex policy additions such as stricter step gates.
+- Do not hand-edit generated global Harness files for persistent changes; add or update an overlay instead.
+
+Current overlay:
+
+- `step-boundary`: enforces one-step-at-a-time execution, progress recording, Step 5 independent review, Step 6 QA verdict, and Step 7-after-PASS gates.
+
 ## Classification
 
 Exact copy:

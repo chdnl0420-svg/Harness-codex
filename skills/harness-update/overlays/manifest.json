@@ -1,0 +1,22 @@
+{
+  "overlays": [
+    {
+      "target": "harness/SKILL.md",
+      "source": "overlays/step-boundary/SKILL.step-boundary.md",
+      "marker": "step-boundary-skill",
+      "action": "append"
+    },
+    {
+      "target": "harness/docs/workflow.md",
+      "source": "overlays/step-boundary/workflow.step-boundary.md",
+      "marker": "step-boundary-workflow",
+      "action": "append"
+    },
+    {
+      "target": "harness/docs/donot.md",
+      "source": "overlays/step-boundary/donot.step-boundary.md",
+      "marker": "step-boundary-donot",
+      "action": "append"
+    }
+  ]
+}
