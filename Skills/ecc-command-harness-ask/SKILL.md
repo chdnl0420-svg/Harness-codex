@@ -11,6 +11,7 @@ origin: local-codex-port-of-chdnl0420-svg-Harness
 ## 동작
 
 - 모드: ask
+- 워크플로 시작 시 사용자에게 Step 1-8과 Complete의 전체 흐름을 짧게 알리고, 각 단계 진입/완료 시 현재 단계와 다음 단계를 안내한다.
 - Step 2는 `harness-plan-ask` 기준으로 처리하고, 차단 환경이나 범위 충돌처럼 사용자 결정이 필요한 지점에서만 질문한다.
 - 질문은 짧게 하고 선택지가 필요한 이유를 함께 설명한다.
 

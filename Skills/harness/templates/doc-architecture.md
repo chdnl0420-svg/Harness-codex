@@ -1,4 +1,4 @@
-﻿# Architecture
+# Architecture
 
 > 이 문서는 **"어떻게 만드는지"** 정의한다. 디렉토리·패턴·데이터 흐름.
 

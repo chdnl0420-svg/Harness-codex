@@ -101,7 +101,8 @@ function Test-ForbiddenText {
         ("claude-" + "fallback"),
         ("Claude " + "main"),
         ("Claude " + "Max"),
-        ("Claude " + "code-reviewer")
+        ("Claude " + "code-reviewer"),
+        "Phase 1.5"
     )
 
     foreach ($pattern in $patterns) {
@@ -116,7 +117,7 @@ function Test-PortablePath {
     param([string]$Relative)
 
     $portableRegexes = @(
-        "^templates/(improvement|learning-proposal)\.md$",
+        "^templates/(doc-prd|doc-architecture|doc-adr|doc-ui-guide|improvement|learning-proposal)\.md$",
         "^docs/(context-layer|examples|file-formats|phases|stop-report|test-guide-format)\.md$"
     )
 
@@ -286,7 +287,7 @@ try {
         $versionText = Write-VersionValue $versionText "upstream_commit" $upstreamCommit
         $versionText = Write-VersionValue $versionText "upstream_branch" $Branch
         $versionText = Write-VersionValue $versionText "update_policy" "portable-auto-sync-plus-manual-port"
-        $versionText = Write-VersionValue $versionText "last_update_check" (Get-Date).ToString("s")
+        $versionText = Write-VersionValue $versionText "last_update_check" (Get-Date).ToString("yyyy-MM-ddTHH:mm:sszzz")
         $versionText = Write-VersionValue $versionText "last_portable_sync_applied" ([string]$applied.Count)
         Write-Utf8NoBom -Path $versionPath -Text $versionText
     }

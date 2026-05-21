@@ -192,7 +192,7 @@ else
   add_check "project:git-root" "WARN" "Project is not a git repository" "Use the current directory as Harness target."
 fi
 
-for dir in .harness .harness/templates .harness/docs .harness/agents/learning .harness/progress .harness/reviews .harness/results .harness/research; do
+for dir in .harness .harness/progress .harness/reviews .harness/results .harness/research; do
   if [ -d "$target_root/$dir" ]; then
     add_check "project:$dir" "PASS" "$target_root/$dir" "None"
   else

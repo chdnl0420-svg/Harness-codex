@@ -44,19 +44,22 @@ Evidence anchors: `evidence:user-request`, `evidence:prd`, `evidence:architectur
 
 git 저장소가 아니거나 history를 읽을 수 없으면 "git history 없음"을 progress 또는 초안 가정에 기록한다.
 
-## Required Categories
+## Required Output Sections
 
-도메인 설계 초안에는 반드시 다음 6개 카테고리를 포함한다.
+도메인 설계 초안에는 6개 도메인 카테고리와 3개 필수 보조 섹션을 포함한다.
 
-1. 요구사항 재진술 (`template-section:requirements-restatement`)
-2. 통합 사용자 시나리오 (`domain-category:integrated-user-scenario`)
-3. 성공 기준 (`domain-category:success-criteria`)
-4. 범위 / 제외 항목 (`domain-category:scope-exclusions`)
-5. 제약 (`domain-category:constraints`)
-6. 외부 의존성 (`domain-category:external-dependencies`)
-7. 비기능 요구 (`domain-category:non-functional-requirements`)
-8. 위험 (`template-section:risks`)
-9. Open Questions (`template-section:open-questions`)
+필수 보조 섹션:
+- 요구사항 재진술 (`template-section:requirements-restatement`)
+- 위험 (`template-section:risks`)
+- Open Questions (`template-section:open-questions`)
+
+6개 도메인 카테고리:
+- 통합 사용자 시나리오 (`domain-category:integrated-user-scenario`)
+- 성공 기준 (`domain-category:success-criteria`)
+- 범위 / 제외 항목 (`domain-category:scope-exclusions`)
+- 제약 (`domain-category:constraints`)
+- 외부 의존성 (`domain-category:external-dependencies`)
+- 비기능 요구 (`domain-category:non-functional-requirements`)
 
 불명확한 내용은 `Open Questions`에 질문과 임시 가정을 함께 남긴다.
 

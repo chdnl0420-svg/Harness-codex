@@ -119,6 +119,9 @@ function Get-CommandVersion {
 
     try {
         $output = & $Name @CommandArgs 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            return ""
+        }
         if ($output -is [array]) {
             return ($output | Select-Object -First 1)
         }
@@ -484,7 +487,13 @@ foreach ($file in $learningFiles) {
 
 $gitAvailable = Test-CommandAvailable "git"
 if ($gitAvailable) {
-    Add-Check "runtime:git" "PASS" (Get-CommandVersion "git" @("--version")) "None"
+    $gitVersion = Get-CommandVersion "git" @("--version")
+    if ([string]::IsNullOrWhiteSpace($gitVersion)) {
+        $status = if ($Mode -eq "audit") { "WARN" } else { "FAIL" }
+        Add-Check "runtime:git" $status "git exists but did not run successfully" "Ensure Git is runnable before Harness init/update."
+    } else {
+        Add-Check "runtime:git" "PASS" $gitVersion "None"
+    }
 } else {
     $status = if ($Mode -eq "audit") { "WARN" } else { "FAIL" }
     Add-Check "runtime:git" $status "git is not available" "Install Git before Harness init/update."
@@ -492,7 +501,13 @@ if ($gitAvailable) {
 
 $bashAvailable = Test-CommandAvailable "bash"
 if ($bashAvailable) {
-    Add-Check "runtime:bash" "PASS" (Get-CommandVersion "bash" @("--version")) "None"
+    $bashVersion = Get-CommandVersion "bash" @("--version")
+    if ([string]::IsNullOrWhiteSpace($bashVersion)) {
+        $status = if ($Mode -eq "init") { "FAIL" } else { "WARN" }
+        Add-Check "runtime:bash" $status "bash exists but did not run successfully" "Install or repair Git Bash/WSL before running bootstrap-runtime.sh."
+    } else {
+        Add-Check "runtime:bash" "PASS" $bashVersion "None"
+    }
 } else {
     $status = if ($Mode -eq "init") { "FAIL" } else { "WARN" }
     Add-Check "runtime:bash" $status "bash is not available" "Install Git Bash or WSL before running bootstrap-runtime.sh."
@@ -549,7 +564,7 @@ if (Test-Path -LiteralPath $projectHarnessDir -PathType Container) {
     Add-Check "project:.harness" "WARN" "$projectHarnessDir is missing" "Run bootstrap only after user approval."
 }
 
-foreach ($dir in @("templates", "docs", "agents\learning", "progress", "research", "reviews", "results")) {
+foreach ($dir in @("progress", "research", "reviews", "results")) {
     $path = Join-Path $projectHarnessDir $dir
     if (Test-Path -LiteralPath $path -PathType Container) {
         Add-Check "project:.harness\$dir" "PASS" $path "None"
@@ -571,12 +586,7 @@ foreach ($file in @("PRD.md", "ARCHITECTURE.md", "ADR.md", "UI_GUIDE.md")) {
 
 $agentsPath = Join-Path $bootstrapTargetRoot "AGENTS.md"
 if (Test-NonEmptyFile -Path $agentsPath) {
-    $agentsText = Get-Content -Raw -Encoding UTF8 -LiteralPath $agentsPath
-    if ($agentsText -match "(?i)harness") {
-        Add-Check "project:AGENTS.md" "PASS" $agentsPath "None"
-    } else {
-        Add-Check "project:AGENTS.md" "WARN" "AGENTS.md exists but does not mention Harness" "Do not overwrite; propose a manual merge."
-    }
+    Add-Check "project:AGENTS.md" "PASS" $agentsPath "None"
 } elseif (Test-Path -LiteralPath $agentsPath -PathType Leaf) {
     Add-Check "project:AGENTS.md" "WARN" "$agentsPath is empty" "Run bootstrap only after user approval."
 } else {

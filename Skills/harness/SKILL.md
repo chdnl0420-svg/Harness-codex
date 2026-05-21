@@ -18,6 +18,7 @@ description: '''DO NOT AUTO-TRIGGER. SLASH-COMMAND-ONLY. Codex용 Harness 단계
 
 - Harness 단계는 `Step 1`부터 `Step 8`까지와 `Complete`뿐이다. `Step 9`는 없다.
 - `Complete`는 번호 없는 최종 보고 단계다. Markdown 목록에서도 `9. Complete`처럼 쓰지 않는다.
+- Harness 워크플로 시작 시 사용자에게 Step 1-8과 Complete의 전체 흐름을 먼저 짧게 알린다. 각 단계 진입/완료 시에도 현재 단계와 다음 단계를 한두 문장으로 안내한다. 이 안내는 승인 요청이 아니며 noask 모드에서도 허용된다.
 - Step을 건너뛰지 않는다. 산출물이나 게이트가 없으면 다음 Step으로 가지 않고 `BLOCKED` 또는 `UNKNOWN`을 기록한다.
 - 상태 라벨은 `PASS`, `FAIL`, `BLOCKED`, `UNKNOWN`만 쓴다. `대체로 OK`, `부분 통과`, `확인 못 했지만 통과` 같은 문구로 바꾸지 않는다.
 - `/harness` noask 모드의 기본 결정 문구는 의미를 바꿔 요약하지 않는다. 불확실하면 `workflow.md`의 결정표를 그대로 따른다.

@@ -1,4 +1,4 @@
-﻿<!--
+<!--
 TEMPLATE: improvement.md
 Generated when a review iteration finds CRITICAL/HIGH issues that need fixing.
 Filename: improvement-<REQUEST_ID>-iter-<N>.md

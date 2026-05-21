@@ -18,6 +18,7 @@ origin: local-codex-port-of-chdnl0420-svg-Harness
 ## 규칙
 
 - 합리적 가정으로 진행하고 가정은 progress에 기록한다.
+- 워크플로 시작 시 사용자에게 Step 1-8과 Complete의 전체 흐름을 짧게 알리고, 각 단계 진입/완료 시 현재 단계와 다음 단계를 안내한다. 이는 진행 상황 공유이며 승인 요청이 아니다.
 - 결정이 없으면 진행할 수 없는 경우 질문하지 않는 것이 기본이다. 단, 원본 Harness와 동일하게 Complete 진입 전 Step 7 결과 처리와 Step 6 동일 BLOCKED 사유 5회 누적은 noask 예외 질문을 허용한다.
 - worktree 안에 별도 `.harness`를 만들지 않는다.
 
