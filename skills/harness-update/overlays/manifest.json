@@ -17,6 +17,36 @@
       "source": "overlays/step-boundary/donot.step-boundary.md",
       "marker": "step-boundary-donot",
       "action": "append"
+    },
+    {
+      "target": "harness/docs/steps/step2-domain.md",
+      "source": "overlays/step2-deep-research/step2-domain.step2-deep-research.md",
+      "marker": "step2-deep-research-domain",
+      "action": "append"
+    },
+    {
+      "target": "harness/docs/workflow.md",
+      "source": "overlays/step2-deep-research/workflow.step2-deep-research.md",
+      "marker": "step2-deep-research-workflow",
+      "action": "append"
+    },
+    {
+      "target": "harness/SKILL.md",
+      "source": "overlays/step2-deep-research/SKILL.step2-deep-research.md",
+      "marker": "step2-deep-research-skill",
+      "action": "append"
+    },
+    {
+      "target": "harness-plan/SKILL.md",
+      "source": "overlays/step2-deep-research/harness-plan.step2-deep-research.md",
+      "marker": "step2-deep-research-harness-plan",
+      "action": "append"
+    },
+    {
+      "target": "harness-plan-ask/SKILL.md",
+      "source": "overlays/step2-deep-research/harness-plan-ask.step2-deep-research.md",
+      "marker": "step2-deep-research-harness-plan-ask",
+      "action": "append"
     }
   ]
 }

@@ -41,9 +41,10 @@ Codex-only corrections that must survive future upstream updates live under `ove
 - Use overlays for local Codex policy additions such as stricter step gates.
 - Do not hand-edit generated global Harness files for persistent changes; add or update an overlay instead.
 
-Current overlay:
+Current overlays:
 
 - `step-boundary`: enforces one-step-at-a-time execution, progress recording, Step 5 independent review, Step 6 QA verdict, and Step 7-after-PASS gates.
+- `step2-deep-research`: keeps Step 2 wired to the `harness-deep-researcher` external research branch across upstream updates.
 
 ## Classification
 

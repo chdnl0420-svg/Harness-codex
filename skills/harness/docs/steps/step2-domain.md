@@ -16,13 +16,26 @@
 **흐름** (두 모드 공통, 입력 수집 방식만 다름):
 
 1. **harness-plan 또는 harness-plan-ask skill 호출** — 산출: 도메인 설계 초안 본문 (사용자 미승인).
-2. skill 결과(초안)를 Codex 가 리뷰
-3. 리뷰 결과를 호출자 Codex 가 검토 / 반영
-4. **승인 분기**:
-   - **noask 모드**: request_user_input 또는 일반 질문 호출 금지. Codex 리뷰 1회 반영한 본문으로 **자동 승인** → 곧장 6번 단계.
+2. **(필요 시) 외부 리서치 포함** — 위 skill 내부 Phase 2에서 외부 정보가 필요하다고 판단되면 `harness-deep-researcher` 를 호출하거나, 불가능하면 호출자 Codex 가 직접 리서치한다. 판단 기준·prompt 4필드·저장 양식은 [`../procedures/deep-research-procedure.md`](../procedures/deep-research-procedure.md) 를 따른다.
+3. skill 결과(초안)를 Codex 가 리뷰
+4. 리뷰 결과를 호출자 Codex 가 검토 / 반영
+5. **승인 분기**:
+   - **noask 모드**: request_user_input 또는 일반 질문 호출 금지. Codex 리뷰 1회 반영한 본문으로 **자동 승인** → 곧장 7번 단계.
    - **ask 모드**: request_user_input 또는 일반 질문 으로 *"1. 승인 / 2. 수정 의견 / 3. 취소"* 제시. 승인 질문 직전에 도메인 설계 본문을 화면에 그대로 보여 사용자가 확인 가능해야 함.
-5. (ask 모드 한정) 수정 의견 시 1번(`harness-plan-ask`) 재호출, 단순 질문 시 답변만 하고 다시 승인 질문, 취소 시 워크플로우 중단.
-6. 파일 작성 (`.harness/domain-<slug>.html`) → step3 로
+6. (ask 모드 한정) 수정 의견 시 1번(`harness-plan-ask`) 재호출, 단순 질문 시 답변만 하고 다시 승인 질문, 취소 시 워크플로우 중단.
+7. 파일 작성 (`.harness/domain-<slug>.html`) → step3 로
+
+## 외부 리서치 호출 — Single Source
+
+step2 의 *외부 리서치* 분기 (라이브러리 비교·최신 모범 사례·보안 권고·API 마이그레이션·사용자 답변의 "조사 필요" 항목 등) 는 [`docs/procedures/deep-research-procedure.md`](../procedures/deep-research-procedure.md) 의 5단계 흐름을 따른다.
+
+권장 어댑터 순서:
+
+- `harness-deep-researcher` skill — workflow 안에서 기본
+- `harness-deep-researcher` agent/helper — 사용 가능한 sub-agent/helper 도구가 있을 때
+- 호출자 Codex 직접 수행 — 위 둘이 불가능할 때
+
+리서치 결과는 `.harness/research/research-<slug>-<NN>-<topic>.md` 에 저장하고, 도메인 초안에는 HIGH confidence Key Findings 만 반영한다. 리서치가 필요 없다고 판단하면 `"리서치 필요 없음 — 사유: …"` 를 진행 로그에 남기고 결과 파일은 만들지 않는다.
 
 ---
 

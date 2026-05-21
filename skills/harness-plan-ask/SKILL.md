@@ -1,6 +1,6 @@
 ---
 name: harness-plan-ask
-description: harness step2 도메인 설계 ask 모드 wrapper. /harness-ask 호출 또는 .harness/.ask 마커 존재 시 사용. request_user_input 또는 일반 질문 으로 6 카테고리 사용자 의도를 인터랙티브 수집한 뒤 plan-readability 규칙을 지키는 도메인 설계 초안을 만든다. /harness step2-domain 안에서만 호출. 일반 계획은 /plan 사용.
+description: harness step2 도메인 설계 ask 모드 wrapper. /harness-ask 호출 또는 .harness/.ask 마커 존재 시 사용. request_user_input 또는 일반 질문 으로 6 카테고리 사용자 의도를 인터랙티브 수집하고, 필요 시 `harness-deep-researcher` 외부 리서치를 거친 뒤 plan-readability 규칙을 지키는 도메인 설계 초안을 만든다. /harness step2-domain 안에서만 호출. 일반 계획은 /plan 사용.
 ---
 
 # harness-plan-ask
@@ -29,6 +29,7 @@ description: harness step2 도메인 설계 ask 모드 wrapper. /harness-ask 호
 ```
 [harness-plan-ask] request_user_input 또는 일반 질문 인터랙티브 모드로 진입합니다.
 6 카테고리 (시나리오/성공기준/범위/제약/외부의존성/비기능) 를 순차로 묻습니다.
+필요 시 harness-deep-researcher 외부 리서치를 거쳐 도메인 초안에 반영합니다.
 중간에 "건너뛰자" 또는 "기본값" 이라고 답하면 그 카테고리는 사용자 위임으로 기록됩니다.
 ```
 

@@ -1,6 +1,6 @@
 ---
 name: harness-plan
-description: harness step2 도메인 plan 작성 skill. 호출 컨텍스트에 따라 noask 모드 (`.harness/.noask` 또는 `/harness`) 면 request_user_input 또는 일반 질문 호출 없이 6 카테고리 합리적 기본값 + Open Questions, interactive 모드 (`.harness/.ask` 또는 `/harness-ask`) 면 request_user_input 또는 일반 질문 순차 카테고리. 필요 시 외부 리서치를 `harness-deep-researcher` 에 Task 위임. /harness step2-domain 안에서만 호출. 일반 계획이 필요하면 /plan 사용.
+description: harness step2 도메인 plan 작성 skill. 호출 컨텍스트에 따라 noask 모드 (`.harness/.noask` 또는 `/harness`) 면 request_user_input 또는 일반 질문 호출 없이 6 카테고리 합리적 기본값 + Open Questions, interactive 모드 (`.harness/.ask` 또는 `/harness-ask`) 면 request_user_input 또는 일반 질문 순차 카테고리. 필요 시 외부 리서치를 `harness-deep-researcher` 에 helper/sub-agent 위임 또는 호출자 Codex 직접 수행. /harness step2-domain 안에서만 호출. 일반 계획이 필요하면 /plan 사용.
 ---
 
 # harness-plan
@@ -130,7 +130,7 @@ noask 모드 산출물도 interactive 모드와 동일하게 메인 컨텍스트
   4. 검증 없는 추론은 *"Inferred:"* 로 분리
 - 결과 저장 경로·양식은 위와 동일. progress 파일에 *"deep-researcher Task 호출 불가 — 메인 직접 수행"* 사유 1줄 기록.
 
-**`.noagent` 마커는 2026-05-20 폐기** — 이전 문서·코드에 잔존해 있어도 본 정합화 정책을 따른다. 마커 파일이 존재해도 무시하고 기본 경로(Task 위임) 우선 시도.
+**`.noagent` 마커는 2026-05-20 폐기** — 이전 문서·코드에 잔존해 있어도 본 정합화 정책을 따른다. 마커 파일이 존재해도 무시하고 기본 경로(helper/sub-agent 위임) 우선 시도.
 
 리서치 불필요 판단:
 - 불필요하면 *"리서치 필요 없음 — 사유: …"* 한 줄 기록 (스킵 금지). 결과 파일도 만들지 않는다.

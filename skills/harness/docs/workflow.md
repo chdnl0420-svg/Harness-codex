@@ -10,7 +10,7 @@
 
 | step | 수행 주체 | 비고 |
 |------|----------|------|
-| step2 도메인 설계 | `harness-plan` skill (noask 동작) | 한 줄 목표 → 6 카테고리 합리적 가정 + Open Questions. `/harness-ask` 는 `harness-plan-ask` (인터랙티브) |
+| step2 도메인 설계 | `harness-plan` skill (noask 동작) | 한 줄 목표 → 6 카테고리 합리적 가정 + 필요 시 `harness-deep-researcher` 외부 리서치 + Open Questions. `/harness-ask` 는 `harness-plan-ask` (인터랙티브) |
 | step3 구현 계획 | `plan` skill — Chunks 임계값 통과 시 vertical slice 분해 + chunk loop | step2 연속성. [steps/step3-impl-plan.md Chunks 분해](steps/step3-impl-plan.md) |
 | step4 구현 | 호출자 Codex 직접. 빌드 실패 시 `build-fix` skill 또는 언어별 `*-build-resolver` agent | TDD 모드면 `tdd` skill / `tdd-guide` agent |
 | step5 리뷰 | **Codex CLI** (`codex exec` 외부) + 보조: `code-review` / `code-reviewer` (fallback), `security-review` / `security-reviewer` (보안 민감 코드) | Codex 외부 CLI 그대로. self-review bias 차단 외부 verifier 유일 보존 |
@@ -295,7 +295,7 @@ TEST_COVERAGE | BUILD_FAILURE | OTHER
 | step | 한 줄 | 상세 |
 |------|------|------|
 | step1 | harness 초기화 | [steps/step1-init.md](steps/step1-init.md) |
-| step2 | 사용자 요청을 구체적 전문적 계획으로 (architecture 가 보고 구현 계획 가능하도록) | [steps/step2-domain.md](steps/step2-domain.md) |
+| step2 | 사용자 요청을 리서치 근거가 필요한지 판단한 뒤 구체적 전문적 계획으로 정리 (architecture 가 보고 구현 계획 가능하도록) | [steps/step2-domain.md](steps/step2-domain.md) |
 | step3 | 구현 계획 작성 | [steps/step3-impl-plan.md](steps/step3-impl-plan.md) |
 | step4 | 구현 | [steps/step4-impl.md](steps/step4-impl.md) |
 | step5 | 리뷰 + LGTM 판정 | [steps/step5-review.md](steps/step5-review.md) |
