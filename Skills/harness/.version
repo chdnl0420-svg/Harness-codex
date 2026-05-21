@@ -1,0 +1,11 @@
+﻿port: codex-local
+installed: 2026-05-20T12:27:04Z
+local_owner: C:/Users/NX3GAMES/.codex/skills/harness
+upstream_reference: https://github.com/chdnl0420-svg/Harness
+upstream_commit: 98d1289129e73b6aaf732d5427eed0fdd01e80de
+upstream_branch: main
+update_policy: portable-auto-sync-plus-manual-port
+update_rule: never overwrite the Codex port from upstream without diff review and user approval
+last_update_check: 2026-05-21T00:00:00+09:00
+last_portable_sync_applied: 1
+last_port_notes: restored upstream noask/input/QA/complete contracts for Codex adapter; preserved Codex path/tool mapping

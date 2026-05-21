@@ -1,0 +1,154 @@
+personality = "pragmatic"
+model = "gpt-5.5"
+model_reasoning_effort = "high"
+[windows]
+sandbox = "unelevated"
+
+[projects.'C:\']
+trust_level = "trusted"
+
+[projects.'D:\Project\ProjectAI']
+trust_level = "trusted"
+
+[projects.'D:\ProjectAI']
+trust_level = "trusted"
+
+[projects.'d:\projectai\design']
+trust_level = "trusted"
+
+[projects.'d:\projectai\client']
+trust_level = "trusted"
+
+[projects.'d:\projectai\server']
+trust_level = "trusted"
+
+[projects.'d:\projectai\planning']
+trust_level = "trusted"
+
+[projects.'d:\projectai\qa']
+trust_level = "trusted"
+
+[projects.'d:\project\test']
+trust_level = "trusted"
+
+[projects.'c:\project\client_ksh_asia_l\client\projectm\assets\tool\buildtool']
+trust_level = "trusted"
+
+[projects.'c:\project\client_ksh_asia_l\client\projectm\assets\scripts']
+trust_level = "trusted"
+
+[projects.'d:\project\ai']
+trust_level = "trusted"
+
+[projects.'d:\project\harness_skillcreator']
+trust_level = "trusted"
+
+[projects.'c:\users\nx3games\documents\codex\2026-04-24-new-chat']
+trust_level = "trusted"
+
+[projects.'d:\project\harness']
+trust_level = "trusted"
+
+[projects.'d:\project\trending']
+trust_level = "trusted"
+
+[projects.'d:\project\autotrade']
+trust_level = "trusted"
+
+[projects.'d:\project\investbuilding']
+trust_level = "trusted"
+
+[projects.'d:\project\ziggum']
+trust_level = "trusted"
+
+[projects.'c:\project\client_ksh_asia_l\client\projectm\assets']
+trust_level = "trusted"
+
+[projects.'d:\project\tmuxproject']
+trust_level = "trusted"
+
+[projects.'c:\users\nx3games']
+trust_level = "trusted"
+
+[projects.'d:\project\testproject']
+trust_level = "trusted"
+
+[projects.'c:\users\nx3games\downloads\l9asia_out_nx3_qa_1.5.2_0513_4']
+trust_level = "trusted"
+
+[projects.'c:\users\nx3games\.claude']
+trust_level = "trusted"
+
+[projects.'d:\project\projectl_kimsunghyun_client\client\projectm\assets']
+trust_level = "trusted"
+
+[projects.'c:\users\nx3games\documents\codex\2026-05-14\goal']
+trust_level = "trusted"
+
+[projects.'c:\users\nx3games\documents\codex\2026-05-20\chdnl0420-svg-harness-https-github-com']
+trust_level = "trusted"
+
+[projects.'c:\users\nx3games\documents\codex\2026-05-20\harness-engineering']
+trust_level = "trusted"
+
+[projects.'d:\project\visualagents']
+trust_level = "trusted"
+
+[projects.'c:\users\nx3games\documents\codex\2026-05-20\harness']
+trust_level = "trusted"
+
+[projects.'c:\users\nx3games\.codex\skills']
+trust_level = "trusted"
+
+[projects.'d:\project\claudeofeveryone']
+trust_level = "trusted"
+
+[projects.'c:\users\nx3games\documents\codex\2026-05-21\harness-plan-c-users-nx3games-codex']
+trust_level = "trusted"
+
+[projects.'c:\users\nx3games\documents\codex\2026-05-21\cli']
+trust_level = "trusted"
+
+[projects.'c:\users\nx3games\documents\codex\2026-05-21\new-chat-2']
+trust_level = "trusted"
+
+[projects.'c:\users\nx3games\documents\obsidian vault\agentview']
+trust_level = "trusted"
+
+[projects.'c:\users\nx3games\documents\codex\2026-05-21\codex-harness-c-users-nx3games-documents']
+trust_level = "trusted"
+
+[plugins."figma@openai-curated"]
+enabled = true
+
+[plugins."documents@openai-primary-runtime"]
+enabled = true
+
+[plugins."spreadsheets@openai-primary-runtime"]
+enabled = true
+
+[plugins."presentations@openai-primary-runtime"]
+enabled = true
+
+[plugins."slack@openai-curated"]
+enabled = true
+
+[plugins."browser@openai-bundled"]
+enabled = true
+
+[marketplaces.openai-bundled]
+last_updated = "2026-05-20T15:55:35Z"
+source_type = "local"
+source = '\\?\C:\Users\NX3GAMES\.codex\.tmp\bundled-marketplaces\openai-bundled'
+
+[marketplaces.openai-primary-runtime]
+last_updated = "2026-05-21T06:19:09Z"
+source_type = "local"
+source = '\\?\C:\Users\NX3GAMES\.cache\codex-runtimes\codex-primary-runtime\plugins\openai-primary-runtime'
+
+[tui.model_availability_nux]
+"gpt-5.5" = 4
+
+[features]
+terminal_resize_reflow = true
+goals = true
