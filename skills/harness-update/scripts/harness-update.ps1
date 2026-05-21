@@ -81,21 +81,27 @@ function Convert-ToCodexText {
         "Claude_in_Chrome" = "Codex Browser"
         "Claude_Preview" = "Codex Browser"
         "Task 도구" = "사용 가능한 helper/sub-agent 도구"
+        "Task subagent" = "helper/sub-agent"
+        "Task 위임" = "helper/sub-agent 위임 또는 호출자 Codex 직접 수행"
         "Skill 도구" = "Codex skill"
         "Skill tool" = "Codex skill"
         "project-claude.md" = "project-agents.md"
+        "<자연어>" = "자연어"
     }
 
     foreach ($key in $replacements.Keys) {
         $result = $result.Replace($key, $replacements[$key])
     }
 
-    $result = $result -replace 'Task\(', '사용 가능한 helper/sub-agent 호출 또는 호출자 Codex 직접 수행('
+    $result = $result -replace 'subagent_type=', 'role='
+    $result = $result -replace 'subagent_type\s*=\s*"([^"]+)"', 'role="$1"'
     $result = $result -replace 'agent_type=', 'role='
     $result = $result -replace 'agent_type\s*=\s*"([^"]+)"', 'role="$1"'
     $result = $result -replace 'agent_type\s*:\s*"([^"]+)"', 'role: "$1"'
-    $result = $result -replace 'subagent_type=', 'role='
-    $result = $result -replace 'subagent_type\s*=\s*"([^"]+)"', 'role="$1"'
+    $result = $result -replace 'Task\(', '사용 가능한 helper/sub-agent 호출 또는 호출자 Codex 직접 수행('
+    $result = $result -replace 'subrole=', 'role='
+    $result = $result -replace 'agent 형태', 'helper/sub-agent 형태'
+    $result = $result -replace 'subagent 컨텍스트', 'helper/sub-agent 컨텍스트'
     $result = $result -replace 'sub-agent 컨텍스트', 'helper/sub-agent 컨텍스트'
     $result = $result -replace 'agent 가 작성한', 'helper 또는 호출자 Codex가 작성한'
     $result = $result -replace 'agent가 작성한', 'helper 또는 호출자 Codex가 작성한'
@@ -232,7 +238,10 @@ function Test-ForbiddenStrings {
         "Task 도구",
         "Skill 도구",
         "Skill tool",
+        "Task subagent",
+        "Task 위임",
         "subagent_type",
+        "subrole=",
         "commands/harness",
         "agents/codex-reviewer",
         "Task\(",
