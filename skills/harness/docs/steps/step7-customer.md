@@ -28,10 +28,11 @@ step5/step6 의 입력 게이트와 동등 강도. 누락 시 step 스킵 위반
    - 모바일 앱이라면: release 빌드 산출물(APK/IPA) 을 device/emulator 에 설치 후 실행
    - 설치·실행 명령과 접근 경로(URL/실행 파일/명령) 를 `test-guide-<slug>.md` 의 "환경" 섹션에 production install 정보로 적어 둔다.
    - 설치/빌드 실패 시 사용자에게 보고 후 결정 요청 (BLOCKED).
-3. `harness-customer-user` 에 위임 — **호출 방식 single source**: [`docs/procedures/customer-test-procedure.md`](../procedures/customer-test-procedure.md) 의 4단계 흐름 + LLM 페르소나 함정 6종 차단 + 권한 정책. 다음 3가지 어댑터 중 하나로 위임 (셋 다 동일 procedure):
-   - `harness-customer-user` skill (Codex skill)
-   - `harness-customer-user` agent (사용 가능한 sub-agent/helper 도구 — 본 워크플로우의 *기본*. sub-agent 별도 컨텍스트 + 페르소나 객관성)
-   - `/harness-customer-user` slash (사용자 진입점 — workflow 내부에선 사용 안 함)
+3. `harness-customer-user` sub-agent/helper 에 위임 — **호출 방식 single source**: [`docs/procedures/customer-test-procedure.md`](../procedures/customer-test-procedure.md) 의 4단계 흐름 + LLM 페르소나 함정 6종 차단 + 권한 정책.
+   - workflow 내부에서는 `harness-customer-user` agent 를 사용 가능한 sub-agent/helper 도구로 호출해야 한다.
+   - `harness-customer-user` skill 은 sub-agent 호출 준비 dispatcher 일 뿐이며 직접 고객 페르소나 수행 fallback 이 아니다.
+   - `/harness-customer-user` slash 는 사용자 진입점이며 workflow 내부 대체 경로로 사용하지 않는다.
+   - sub-agent/helper 도구가 없으면 즉시 `BLOCKED / DEPENDENCY_MISSING` 으로 기록하고 step8 진입 금지.
    - **[Learning Prepend 계약](../workflow.md#critical-learning-prepend-계약-모든-harness--agent-공통) 1·2·3·4 단계 수행 필수.** 즉 다음을 Read 후 `## Prior Learning (READ FIRST — DO NOT SKIP)` 헤더로 prepend:
      - `~/.codex/skills/harness/agents/learning/harness-customer-user.md` (공용만 — 프로젝트 learning 은 2026-05-20 폐기)
    - **test-guide-<slug>.md 전문 prepend** (Prior Learning 헤더 다음, 본 작업 앞)

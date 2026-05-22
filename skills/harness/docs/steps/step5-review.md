@@ -12,13 +12,13 @@
    - `codex-reviewer` agent (사용 가능한 sub-agent/helper 도구)
    - `/harness-review` slash (사용자 진입점 — workflow 내부에선 사용 안 함)
    - Codex 호출이 불가하면 fallback: `code-review` skill (Codex skill, skill="code-review") — 호출자 Codex 가 직접 수행
-2. **(필요 시) 외부 검증 — `harness-deep-researcher` 위임** — 리뷰어 응답이 다음 신호 중 하나라도 보이면 LGTM 추출 **전에** 리서치 실시:
+2. **(필요 시) 외부 검증 — `$deepresearch` 사용** — 리뷰어 응답이 다음 신호 중 하나라도 보이면 LGTM 추출 **전에** 리서치 실시:
    - *"verify against current standards / latest docs / 최신 권고 확인 필요"* 류 표현
    - 사용한 라이브러리·API 의 deprecated · breaking change 여부 확인 요청
    - 보안 권고(OWASP / NIST / CVE) 충족 여부 확인 요청
    - *"이 결정이 2026 모범 사례 인지 확인 필요"* 류 메타 신호
-   - 위임 방식·산출물 양식은 deep research 절차와 동일 (Topic / Tier / Context / 조사 일자 + `.harness/research/research-<slug>-<NN>-<topic>.md` 저장).
-   - 위임 prompt 는 **[Learning Prepend 계약](../workflow.md#critical-learning-prepend-계약-모든-harness--agent-공통) 1·2·3·4 단계 수행 필수** — `harness-deep-researcher.md` 공용 학습 파일을 실제로 읽기 후 `## Prior Learning (READ FIRST — DO NOT SKIP)` 헤더로 prepend. 누락 시 도우미가 `[BLOCKED]` 로 거부. (2026-05-20: 프로젝트 learning 폐기 — 공용만 prepend.)
+   - shared `$deepresearch` skill 을 호출하고 report 는 `.harness/research/` 아래 Markdown 파일로 생성하도록 요청한다.
+   - Harness 전용 deep-research learning prepend 나 helper/sub-agent 호출은 사용하지 않는다.
    - 리서치 결과는 `review-<slug>.md` 의 *"외부 검증"* 섹션으로 누적하고, 그 결과를 반영해 리뷰어에게 **재호출** 하거나 호출자 Codex 가 LGTM 판정에 반영.
 3. **(필요 시) 보안 게이트 — `security-review` skill / `security-reviewer` agent 추가 호출** — step4 변경 파일 중 다음 영역이 *하나라도* 포함되면 *Codex 리뷰와 별도로* 보안 전용 게이트를 거친다:
    - 인증·인가 코드 (auth / authz / session / token / JWT / OAuth)

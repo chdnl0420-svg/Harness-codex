@@ -1,15 +1,15 @@
 ---
 name: harness-update
-description: Slash command '/harness-update'. Update the real global Codex skills directory and Harness custom-agent registrations from https://github.com/chdnl0420-svg/Harness without asking questions. Classify upstream files into exact-copy, minimal-Codex-port, and port-required groups, validate a staged Codex port, then replace the managed Harness skills and agents under $CODEX_HOME automatically.
+description: Slash command '/harness-update'. Install or update Harness for Codex from https://github.com/chdnl0420-svg/Harness-Codex into the current Codex home without interactive questions.
 ---
 
 # harness-update
 
-Use only when the user explicitly invokes `/harness-update` or directly asks to create/run the Harness update flow.
+Use only when the user explicitly invokes `/harness-update` or directly asks to install/update Harness for Codex.
 
 ## Behavior
 
-Run the bundled script without asking questions:
+Run the bundled installer without asking questions:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File "<this skill>/scripts/harness-update.ps1"
@@ -17,67 +17,28 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "<this skill>/scripts/harnes
 
 Default behavior:
 
-- Clone `https://github.com/chdnl0420-svg/Harness` at `main`.
-- Build a temporary staged Codex port from the classified upstream file set.
-- Validate the staged port before touching the live global skills directory.
-- Replace only managed Harness skills in `$CODEX_HOME/skills` or `~/.codex/skills`:
-  - `harness`
-  - `harness-plan`
-  - `harness-plan-ask`
-  - `harness-review`
-  - `harness-deep-researcher`
-  - `harness-customer-user`
-- Register managed Harness custom agents in `$CODEX_HOME/agents` or `~/.codex/agents`:
-  - `codex-reviewer`
-  - `harness-customer-user`
-  - `harness-deep-researcher`
-  - `harness-qa-engineer`
-- The repository distribution layout mirrors `$CODEX_HOME`: root `skills/` contains skills, root `agents/` contains custom-agent registry files. Do not create nested `.codex/agents` inside this repository.
-- Move existing managed Harness skills and old `ecc-command-harness*` wrappers to `$CODEX_HOME/harness-update-backups/<timestamp>` before replacement.
-- Move existing managed Harness custom-agent files to `$CODEX_HOME/harness-update-backups/<timestamp>/agents/` before replacement.
-- Install only the Codex-supported surface.
-- Do not install Claude Code `commands/`, root `README.md`, upstream `.version`, or `.gitattributes`.
-- Write reports to `$CODEX_HOME/harness-update-reports/`.
+- Clone `https://github.com/chdnl0420-svg/Harness-Codex.git` at `main`.
+- Treat that repository as the Codex-ready distribution. Do not port, classify, or transform files from the old `Harness` repository.
+- Install source `skills/*` directories into `$CODEX_HOME/skills` or `~/.codex/skills`.
+- Install source `agents/*.md` files into `$CODEX_HOME/agents` or `~/.codex/agents`.
+- Back up previously managed Harness skills, agents, and old `ecc-command-harness*` wrappers to `$CODEX_HOME/harness-update-backups/<timestamp>` before replacement unless `-NoBackup` is passed.
+- Write an install report to `$CODEX_HOME/harness-update-reports/update-<timestamp>.json`.
 
-## Persistent Codex Overlays
+Managed legacy names removed or replaced by this installer:
 
-Codex-only corrections that must survive future upstream updates live under `overlays/`.
+- Skills: `harness`, `harness-plan`, `harness-plan-ask`, `harness-review`, `harness-deep-researcher`, `harness-customer-user`, `harness-update`
+- Agents: `codex-reviewer`, `harness-customer-user`, `harness-deep-researcher`, `harness-qa-engineer`
 
-- `overlays/manifest.json` lists generated target files and overlay snippets.
-- The script applies overlays after upstream classification/porting and before validation.
-- Use overlays for local Codex policy additions such as stricter step gates.
-- Do not hand-edit generated global Harness files for persistent changes; add or update an overlay instead.
+## Options
 
-Current overlays:
+The script supports:
 
-- `step-boundary`: enforces one-step-at-a-time execution, progress recording, Step 5 independent review, Step 6 QA verdict, and Step 7-after-PASS gates.
-- `step2-deep-research`: keeps Step 2 wired to the `harness-deep-researcher` external research branch across upstream updates.
-
-## Classification
-
-Exact copy:
-
-- `LICENSE` into `harness/LICENSE`
-- Safe templates: `doc-adr.md`, `doc-architecture.md`, `doc-prd.md`, `doc-ui-guide.md`, `improvement.md`
-
-Minimal Codex port:
-
-- Core docs: `workflow.md`, `donot.md`, `html-output-rule.md`, `test-guide-format.md`
-- Step docs: `docs/steps/*.md`
-- Procedure docs: `codex-review-procedure.md`, `customer-test-procedure.md`, `deep-research-procedure.md`
-- Agent registry files: `agents/codex-reviewer.md`, `agents/harness-customer-user.md`, `agents/harness-deep-researcher.md`, `agents/harness-qa-engineer.md`
-- Learning files: `agents/learning/*.md`
-- Additional templates: `learning-proposal.md`, `plan.md`, `progress.md`, `result.md`, `review.md`, `project-claude.md` as `project-agents.md`
-
-Port required:
-
-- `skills/harness/SKILL.md`
-- `skills/harness-plan/SKILL.md`
-- `skills/harness-plan-ask/SKILL.md`
-- `skills/harness-review/SKILL.md`
-- `skills/harness-deep-researcher/SKILL.md`
-- `skills/harness-customer-user/SKILL.md`
-- `skills/harness/core/bootstrap-runtime.sh`
+- `-CodexHome <path>`: override `$CODEX_HOME`.
+- `-UpstreamUrl <url>`: override the Harness-Codex git URL.
+- `-Ref <branch-or-tag>`: install a branch or tag instead of `main`.
+- `-SourcePath <path>`: install from an already checked-out local Harness-Codex directory. This is for verification and development.
+- `-NoBackup`: remove existing managed files instead of moving them to a backup directory.
+- `-KeepTemp`: keep the temporary clone for debugging.
 
 ## Verification
 
@@ -85,9 +46,8 @@ After the script runs, report:
 
 - installed global skills path
 - installed global agents path
-- upstream commit
-- registered managed agent names
-- exact/minimal/ported/excluded counts
-- forbidden-string check result
-- broken relative Markdown link count
-- `bootstrap-runtime.sh` `bash -n` result, if `bash` is available
+- upstream URL and commit/ref
+- installed skill names
+- installed agent file names
+- backup path, if any
+- report path

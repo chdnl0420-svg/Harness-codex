@@ -1,6 +1,6 @@
 ---
 name: harness-plan
-description: harness step2 도메인 plan 작성 skill. 호출 컨텍스트에 따라 noask 모드 (`.harness/.noask` 또는 `/harness`) 면 request_user_input 또는 일반 질문 호출 없이 6 카테고리 합리적 기본값 + Open Questions, interactive 모드 (`.harness/.ask` 또는 `/harness-ask`) 면 request_user_input 또는 일반 질문 순차 카테고리. 필요 시 외부 리서치를 `harness-deep-researcher` 에 helper/sub-agent 위임 또는 호출자 Codex 직접 수행. /harness step2-domain 안에서만 호출. 일반 계획이 필요하면 /plan 사용.
+description: harness step2 도메인 plan 작성 skill. 호출 컨텍스트에 따라 noask 모드 (`.harness/.noask` 또는 `/harness`) 면 request_user_input 또는 일반 질문 호출 없이 6 카테고리 합리적 기본값 + Open Questions, interactive 모드 (`.harness/.ask` 또는 `/harness-ask`) 면 request_user_input 또는 일반 질문 순차 카테고리. 필요 시 외부 리서치는 전용 Harness 딥리서치가 아니라 shared `$deepresearch` skill (`~/.codex/skills/deepresearch/SKILL.md`) 로 수행한다. /harness step2-domain 안에서만 호출. 일반 계획이 필요하면 /plan 사용.
 ---
 
 # harness-plan
@@ -97,9 +97,9 @@ Open Questions 누적:
 
 noask 모드 산출물도 interactive 모드와 동일하게 메인 컨텍스트 + (필요 시) `.harness/research/answers-<slug>.md` 누적.
 
-### Phase 2. (필요 시) 외부 리서치 — `harness-deep-researcher` 위임
+### Phase 2. (필요 시) 외부 리서치 — `$deepresearch` 사용
 
-외부 정보가 필요하면 **`harness-deep-researcher`** helper를 우선 사용하고, 불가능하면 호출자 Codex가 직접 리서치한다. 필요 판정 기준 (다음 중 하나라도 해당하면 리서치 실시):
+외부 정보가 필요하면 전용 Harness 딥리서치 helper/sub-agent를 쓰지 말고 **shared `$deepresearch` skill** (`~/.codex/skills/deepresearch/SKILL.md`) 을 사용한다. 필요 판정 기준 (다음 중 하나라도 해당하면 리서치 실시):
 - 라이브러리·프레임워크 비교 또는 선택
 - 최신 모범 사례 · current trends (학습 데이터 cutoff 이후 변경 가능 영역)
 - 보안 권고 (OWASP / NIST / CVE)
@@ -107,32 +107,21 @@ noask 모드 산출물도 interactive 모드와 동일하게 메인 컨텍스트
 - Phase 1 답변에 *"조사 필요"* 가 명시된 항목
 - 사용자가 명시적으로 "조사 / 비교 / 확인" 요청
 
-**기본 경로 (helper/sub-agent 우선, 직접 수행 fallback)**:
+**호출 방식**:
 
-- 사용 가능한 helper/sub-agent 도구가 있으면 `harness-deep-researcher` 역할로 호출한다.
-- helper/sub-agent 도구가 없으면 호출자 Codex가 같은 입력으로 직접 수행한다.
+- `$deepresearch` 를 호출한다.
 - prompt 에 4개 필드 명시:
   ```
   Topic: <조사 주제>
-  Tier: light | standard | deep
-  Context: <도메인 / 기술 스택 / 결정 영향 범위>
+  Scope: <조사 범위와 제외 항목>
+  Context: <Harness step2 / slug / 도메인 / 기술 스택 / 결정 영향 범위>
   조사 일자: YYYY-MM-DD
   ```
-- prompt 맨 앞에 Learning Prepend 4단계 헤더 (`## Prior Learning (READ FIRST — DO NOT SKIP)`) — workflow.md "Learning Prepend 계약" 참조.
-- 호출자 Codex 는 도우미 응답을 받아 `.harness/research/research-<slug>-<NN>-<topic>.md` 에 **저장** — 응답의 *Summary · Key Findings · Sources Consulted · Search Trail · Stop reason* 그대로 보존 + 1줄 헤더 (주제, 일자, 호출자 메모).
-- 메인 컨텍스트엔 *"리서치 결과: research-<slug>-<NN>-<topic>.md 참고"* 한 줄 + HIGH confidence Key Findings 만 prepend.
-
-**Fallback 경로** — 사용 가능한 helper/sub-agent 도구 호출이 환경적으로 불가한 경우에만:
-
-- 호출자 Codex가 직접 `WebSearch` / `WebFetch` / 라이브러리 docs 조회.
-- 환각 차단 4규칙은 동일 적용:
-  1. No citation = no claim
-  2. No paraphrasing from training data
-  3. No fabricated URLs (WebFetch 실패한 URL 인용 금지)
-  4. 검증 없는 추론은 *"Inferred:"* 로 분리
-- 결과 저장 경로·양식은 위와 동일. progress 파일에 *"deep-researcher Task 호출 불가 — 메인 직접 수행"* 사유 1줄 기록.
-
-**`.noagent` 마커는 2026-05-20 폐기** — 이전 문서·코드에 잔존해 있어도 본 정합화 정책을 따른다. 마커 파일이 존재해도 무시하고 기본 경로(helper/sub-agent 위임) 우선 시도.
+- report 출력 경로는 `.harness/research/` 아래 Markdown 파일로 요청한다.
+- 호출자 Codex 는 `$deepresearch` 가 만든 Markdown report 경로를 progress 에 기록한다.
+- 메인 컨텍스트엔 *"리서치 결과: <report-path> 참고"* 한 줄 + high-confidence cited findings 만 prepend.
+- `$deepresearch` 의 pass tier, source rules, high-stakes rules, report naming, completion criteria 를 그대로 따른다.
+- Harness 전용 `harness-deep-researcher` agent, learning prepend, `.noagent` 분기는 사용하지 않는다.
 
 리서치 불필요 판단:
 - 불필요하면 *"리서치 필요 없음 — 사유: …"* 한 줄 기록 (스킵 금지). 결과 파일도 만들지 않는다.
@@ -170,7 +159,7 @@ Phase 1 답변 + Phase 2 리서치를 합쳐 **도메인 설계 초안** 을 만
 
 ## 호출자(step2-domain.md) 가 알아야 할 사실
 
-- 이 skill 은 step2-domain.md 의 흐름 중 **"사용자 질의 → 리서치 → 도메인 초안 작성"** 까지 한 덩어리로 담당. 그 다음의 Codex 리뷰 / 사용자 승인 / 파일 저장은 호출자 책임.
+- 이 skill 은 step2-domain.md 의 흐름 중 **"사용자 질의 → 필요 시 `$deepresearch` → 도메인 초안 작성"** 까지 한 덩어리로 담당. 그 다음의 Codex 리뷰 / 사용자 승인 / 파일 저장은 호출자 책임.
 - `/plan` 의 일반 plan 출력 형식과 달리 **도메인 설계 카테고리** 를 따른다.
 - **request_user_input 또는 일반 질문 호출 없이 plan 본문이 만들어졌다면 워크플로우 위반** 으로 간주 — 다시 Phase 1 부터 시작한다.
 - 사용자가 *"질문 더 안 해도 돼, 알아서 해줘"* 라고 명시적으로 말하면 그것을 기록(*"사용자 명시 위임"*)하고 Phase 1 의 남은 카테고리를 기본 가정으로 메우되, Phase 3 의 *"Open Questions"* 에 그 가정들을 모두 적어 사용자가 step2 의 최종 승인 단계에서 점검할 수 있게 한다.

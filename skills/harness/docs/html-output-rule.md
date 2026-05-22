@@ -6,10 +6,10 @@
 
 다음 모두가 산출물을 만들 때 본 규칙 적용:
 
-- `/harness` 메인 + `/harness-*` 모든 슬래시 커맨드 (harness-spec / harness-review / harness-customer-user / harness-deep-researcher / harness-distill / harness-ask / harness-audit / harness-setup / harness-help)
-- 페르소나 3개 helper/sub-agent (`harness-deep-researcher` · `harness-qa-engineer` · `harness-customer-user`)
+- `/harness` 메인 + `/harness-*` 모든 슬래시 커맨드 (harness-spec / harness-review / harness-customer-user / harness-distill / harness-ask / harness-audit / harness-setup / harness-help)
+- 페르소나 helper/sub-agent (`harness-qa-engineer` · `harness-customer-user`) 및 shared `$deepresearch` report
 - harness 가 호출하는 일반 skill/agent (`plan` · `tdd` · `code-review` · `security-review` · `build-fix` · `architect` · `code-reviewer` · `security-reviewer` · `tdd-guide` · 언어별 `*-build-resolver`) 가 harness 컨텍스트에서 산출물 작성 시 — 호출 prompt 에 본 규칙 명시 prepend.
-- harness 호출자 Codex (통합 모드)
+- harness 호출자 Codex (sub-agent 강제 모드)
 - `.harness/` 디렉터리에 떨어지는 모든 산출물 — domain / implementation / progress / review / research / qa / customer / test-guide / report / state / events / export 등 (분류별 HTML, MD, JSON, NDJSON)
 
 ## 산출물 파일 확장자 (분류별 분기)
@@ -83,5 +83,5 @@
 | 코드/문서 리뷰 (`harness-review`) | "Summary" | 총평·CRITICAL/HIGH 카운트·권고 액션 |
 | QA 결과 (`harness-qa-engineer`) | "Summary" | Pass/Fail·블록·재현률 |
 | Customer test (`harness-customer-user`) | "Summary" | SUS·SEQ·Time-to-First-Value·첫 인상 |
-| Deep research (`harness-deep-researcher`) | "TL;DR" | 1-3문장 결론 + 핵심 근거 카드 |
+| Deep research (`$deepresearch`) | "TL;DR" | 1-3문장 결론 + 핵심 근거 카드 |
 | Stop / Commit report | "Summary" | 한 일·다음 액션·미해결 항목 |

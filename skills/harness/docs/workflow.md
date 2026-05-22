@@ -1,21 +1,31 @@
 # /harness Workflow
 
+### CRITICAL: sub-agent 강제 계약
+
+`harness-qa-engineer` 와 `harness-customer-user` 는 호출자 Codex가 직접 대체할 수 없다.
+
+- 사용 가능한 sub-agent/helper 도구가 있으면 반드시 해당 agent 로 호출한다.
+- sub-agent/helper 도구가 없으면 해당 step 은 `BLOCKED / DEPENDENCY_MISSING` 으로 기록한다.
+- 호출자 Codex가 같은 입력으로 직접 QA/customer persona 를 수행해 PASS, FAIL, UNKNOWN, customer verdict 를 만들면 무효다.
+- `harness-customer-user` skill 은 sub-agent 호출 준비 wrapper 이며, 직접 수행 fallback 이 아니다.
+- 기존 문서의 "통합 모드", "직접 수행", "manual self-test" 문구가 이 계약과 충돌하면 이 계약이 우선한다.
+
 ---
 
 ## 실행 옵션
 
 모든 harness-* 단위가 *skill* 로 통합. 호출자 Codex 가 Codex skill로 각 단위 호출 — Task sub-agent 별도 컨텍스트 가치는 *외부 CLI (codex exec)* 와 *MCP 브라우저 도구* 만 유지.
 
-### 통합 모드 (default)
+### sub-agent 강제 모드 (default)
 
 | step | 수행 주체 | 비고 |
 |------|----------|------|
-| step2 도메인 설계 | `harness-plan` skill (noask 동작) | 한 줄 목표 → 6 카테고리 합리적 가정 + 필요 시 `harness-deep-researcher` 외부 리서치 + Open Questions. `/harness-ask` 는 `harness-plan-ask` (인터랙티브) |
+| step2 도메인 설계 | `harness-plan` skill (noask 동작) | 한 줄 목표 → 6 카테고리 합리적 가정 + 필요 시 shared `$deepresearch` 외부 리서치 + Open Questions. `/harness-ask` 는 `harness-plan-ask` (인터랙티브) |
 | step3 구현 계획 | `plan` skill — Chunks 임계값 통과 시 vertical slice 분해 + chunk loop | step2 연속성. [steps/step3-impl-plan.md Chunks 분해](steps/step3-impl-plan.md) |
 | step4 구현 | 호출자 Codex 직접. 빌드 실패 시 `build-fix` skill 또는 언어별 `*-build-resolver` agent | TDD 모드면 `tdd` skill / `tdd-guide` agent |
 | step5 리뷰 | **Codex CLI** (`codex exec` 외부) + 보조: `code-review` / `code-reviewer` (fallback), `security-review` / `security-reviewer` (보안 민감 코드) | Codex 외부 CLI 그대로. self-review bias 차단 외부 verifier 유일 보존 |
-| step6 QA | `harness-qa-engineer` agent (사용 가능한 sub-agent/helper 도구) | 페르소나 객관성 보존 위해 sub-agent 유지. MCP 브라우저 가용성이 객관 게이트 |
-| step7 커스터머 | `harness-customer-user` skill 또는 agent | [steps/step7-customer.md](steps/step7-customer.md) |
+| step6 QA | `harness-qa-engineer` agent (사용 가능한 sub-agent/helper 도구) | sub-agent 호출 필수. 없으면 `BLOCKED / DEPENDENCY_MISSING`; 호출자 Codex 직접 QA 금지 |
+| step7 커스터머 | `harness-customer-user` agent (사용 가능한 sub-agent/helper 도구) | sub-agent 호출 필수. skill 은 dispatcher일 뿐이며 직접 페르소나 수행 금지 |
 | step8 commit | 호출자 Codex 직접 + Chunks 모드면 chunk 별 incremental commit | — |
 
 **외부 의존성 (helper가치 유지 영역)**:
@@ -51,7 +61,7 @@ enum 외 값은 정책 위반이다. `CONTRACT_MISSING` 은 도메인/상위 계
 
 ---
 
-## CRITICAL: Learning Prepend 계약 (모든 `harness-*` agent 공통)
+## CRITICAL: Learning Prepend 계약 (QA/customer `harness-*` agent 공통)
 
 호출자 Codex 가 `harness-*` sub-agent 를 **사용 가능한 sub-agent/helper 도구로 호출하기 직전** 4단계를 **반드시 순서대로** 수행. 하나라도 누락 시 호출 자체 금지 (도우미가 학습을 못 본 채 작동 = 학습 시스템 무력화).
 
@@ -88,13 +98,13 @@ enum 외 값은 정책 위반이다. `CONTRACT_MISSING` 은 도메인/상위 계
 
 각 `harness-*` helper는 prompt 첫 200줄 안에 `## Prior Learning (READ FIRST` 헤더 부재 시 즉시 한 줄 거부: `[BLOCKED] Prior Learning header 누락 — workflow.md "Learning Prepend 계약" 위반.` 그 외 작업 일체 금지.
 
-### 호출자 Codex 직접 수행 시
+### 호출자 Codex 직접 수행 금지
 
-helper/sub-agent 호출 없이 호출자 Codex 가 페르소나 작업을 직접 수행할 때도 **그 step 수행 직전 동일하게 공용 학습 파일을 Read** 해 본인 컨텍스트에 올림. 누락 = 위반.
+helper/sub-agent 호출 없이 호출자 Codex 가 `harness-qa-engineer` 또는 `harness-customer-user` 페르소나 작업을 직접 수행하는 것은 금지한다. sub-agent/helper 도구를 사용할 수 없으면 공용 학습 파일을 읽어 직접 대체하지 말고 `BLOCKED / DEPENDENCY_MISSING` 으로 기록한다.
 
 ### 적용 범위
 
-`harness-deep-researcher` · `harness-qa-engineer` · `harness-customer-user` 3개 페르소나 도우미만 적용. 일반 skill/agent (`plan`, `tdd`, `code-review`, `security-review`, `build-fix` 등) 는 harness 전용이 아니므로 본 계약 비대상. 외부 CLI(Codex) 도 sub-agent 아니므로 적용 안 됨.
+`harness-qa-engineer` · `harness-customer-user` 2개 페르소나 도우미만 적용. 외부 리서치는 shared `$deepresearch` skill 을 사용하므로 본 계약 비대상. 일반 skill/agent (`plan`, `tdd`, `code-review`, `security-review`, `build-fix` 등) 는 harness 전용이 아니므로 본 계약 비대상. 외부 CLI(Codex) 도 sub-agent 아니므로 적용 안 됨.
 
 ---
 
@@ -180,8 +190,8 @@ step6. QA 테스트
    │              * BLOCKED 사유 enum 8종: DEPENDENCY_MISSING | EVIDENCE_GATE_FAIL | PERMISSION_DENIED | GUIDE_MISSING | ENV_UNREACHABLE | CONTRACT_MISSING | TDD_MISSING | OTHER
    │
    ├─ UNKNOWN ──> 슬러그 `paused-by-unknown` 마킹 + report 사유 기록
-   │              * fallback = manual self-test + PASS 라벨 시 자동 강등
-   │              * harness-qa-engineer 호출 0회 + PASS 라벨 시 자동 강등
+   │              * sub-agent/helper 도구 부재 시 `BLOCKED / DEPENDENCY_MISSING`
+   │              * harness-qa-engineer 호출 0회 + PASS 라벨 시 자동 BLOCKED 강등
    │              * noask 무인 모드면 다음 슬러그 자동 시작
    │
    └─ PASS (라벨 추출 규칙 충족 + 산출물 게이트 4축 YES + self-PASS 아닐 때만 인정)

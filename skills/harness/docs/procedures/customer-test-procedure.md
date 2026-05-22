@@ -103,9 +103,11 @@ arXiv 2601.17087 (Lost in Simulation) 측정:
 | 호출자 | 진입점 | 컨텍스트 |
 |--------|--------|---------|
 | `/harness-customer-user` (slash) | 사용자 직접 호출 | adhoc, 사용자가 production install 정보 직접 명시 |
-| `harness-customer-user` (skill) | 호출자 Codex Codex skill | workflow step7 내부, slug + test-guide 전달 |
-| `harness-customer-user` (agent) | 호출자 Codex 사용 가능한 sub-agent/helper 도구 | sub-agent 별도 컨텍스트, Prior Learning header + test-guide 전문 prepend 필수 |
-| step7-customer.md (workflow) | 호출자 Codex — 위 어댑터 중 하나 호출 (기본 agent) | slug + test-guide + production install 정보 |
+| `harness-customer-user` (skill) | 호출자 Codex Codex skill | sub-agent 호출 준비 dispatcher. 직접 고객 페르소나 수행 금지 |
+| step7-customer.md (workflow) | 호출자 Codex 가 agent 호출 준비 | slug + test-guide + production install 정보. workflow 내부 직접 수행 금지 |
+| `harness-customer-user` (agent) | 호출자 Codex 사용 가능한 sub-agent/helper 도구 | workflow step7 필수 경로. sub-agent 별도 컨텍스트, Prior Learning header + test-guide 전문 prepend 필수 |
+
+Workflow step7 에서는 `harness-customer-user` agent 호출이 필수다. 사용 가능한 sub-agent/helper 도구가 없으면 `BLOCKED / DEPENDENCY_MISSING` 으로 기록하고, 호출자 Codex가 고객 페르소나를 직접 수행하지 않는다.
 
 ## Worktree 처리 (CRITICAL)
 

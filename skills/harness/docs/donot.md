@@ -37,7 +37,7 @@
 - step4 시작 시 `implementation-<slug>.html` 전문 **재 Read 필수**.
 - step6/step7 도우미 호출 시 `test-guide-<slug>.md` 전문을 prompt 에 prepend 하지 않으면 호출 자체 금지.
 - **모든 `harness-*` helper/sub-agent 호출 시 [Learning Prepend 계약](workflow.md#critical-learning-prepend-계약-모든-harness--agent-공통) 4단계 (파일 경로 식별 → Read → `## Prior Learning (READ FIRST — DO NOT SKIP)` 헤더로 prepend → 본 작업 prepend) 수행 필수.** 학습 파일 경로 "기억"·"요약" 대체 금지 — 매번 실제 Read. 비어 있으면 `"(빈 파일)"` 명시. 위반 시 도우미가 `[BLOCKED] Prior Learning header 누락` 으로 거부.
-- 통합 모드 (호출자 Codex 가 페르소나 도우미 `harness-customer-user` / `harness-qa-engineer` / `harness-deep-researcher` 자리를 직접 수행) 에서도 동일하게 공용 학습 파일을 Read 해 본인 컨텍스트에 올림. 누락 = 위반.
+- `harness-customer-user` / `harness-qa-engineer` 페르소나 도우미는 sub-agent/helper 호출이 필수다. 호출자 Codex 직접 수행 fallback 금지. sub-agent/helper 도구가 없으면 `BLOCKED / DEPENDENCY_MISSING` 으로 기록하고 다음 step 진입 금지. 외부 리서치는 shared `$deepresearch` skill 을 사용하며 Harness deep-research learning 파일을 읽지 않는다.
 
 ## 4. 추측 구현
 
@@ -78,7 +78,7 @@
 
 - **"한 세션에 불가" → 일부만 진행 후 자동 일시정지** (chunks 1·2 만 PASS 시키고 임의 종결). 정책의 noask 위임("끝까지 돌려라") + Chunks 회송 카운터 + BLOCKED 분기가 알아서 처리.
 - **"변경 작아서 Codex 리뷰 생략" → inline self-review**. step5 는 self-PASS bias 차단 외부 게이트 — 변경 크기·확신도 무관 외부 verifier 호출. 면제 분기 없음.
-- **"UI 변화 없어서 QA sub-agent 면제"**. 정책: `qa-engineer 0회 호출 AND PASS = UNKNOWN 강등 + paused-by-unknown 마킹`. 호출 자체가 자동 발동.
+- **"UI 변화 없어서 QA sub-agent 면제"**. 정책: `qa-engineer 0회 호출` 또는 `customer-user 0회 호출` 상태에서 PASS/고객 검증 완료 처리 금지. sub-agent/helper 도구가 없으면 `BLOCKED / DEPENDENCY_MISSING`.
 - **chunk 묶음 commit / incremental commit 통합**. 정책: chunk 별 incremental commit. 묶음 = 위반.
 - **"사용자가 큰 작업을 던진 게 실수" 선의의 가부장주의**. 사용자 명시 위임을 호출자 Codex 가 재해석·축소 = 위임 부정.
 

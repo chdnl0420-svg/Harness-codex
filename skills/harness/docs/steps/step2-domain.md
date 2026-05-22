@@ -16,7 +16,7 @@
 **흐름** (두 모드 공통, 입력 수집 방식만 다름):
 
 1. **harness-plan 또는 harness-plan-ask skill 호출** — 산출: 도메인 설계 초안 본문 (사용자 미승인).
-2. **(필요 시) 외부 리서치 포함** — 위 skill 내부 Phase 2에서 외부 정보가 필요하다고 판단되면 `harness-deep-researcher` 를 호출하거나, 불가능하면 호출자 Codex 가 직접 리서치한다. 판단 기준·prompt 4필드·저장 양식은 [`../procedures/deep-research-procedure.md`](../procedures/deep-research-procedure.md) 를 따른다.
+2. **(필요 시) 외부 리서치 포함** — 위 skill 내부 Phase 2에서 외부 정보가 필요하다고 판단되면 shared `$deepresearch` skill 을 호출한다. 판단 기준과 Harness 연결 방식은 [`../procedures/deep-research-procedure.md`](../procedures/deep-research-procedure.md) 를 따른다.
 3. skill 결과(초안)를 Codex 가 리뷰
 4. 리뷰 결과를 호출자 Codex 가 검토 / 반영
 5. **승인 분기**:
@@ -60,15 +60,9 @@ Step2 도메인 산출물은 `Domain Contract` 섹션을 반드시 포함한다.
 
 ## 외부 리서치 호출 — Single Source
 
-step2 의 *외부 리서치* 분기 (라이브러리 비교·최신 모범 사례·보안 권고·API 마이그레이션·사용자 답변의 "조사 필요" 항목 등) 는 [`docs/procedures/deep-research-procedure.md`](../procedures/deep-research-procedure.md) 의 5단계 흐름을 따른다.
+step2 의 *외부 리서치* 분기 (라이브러리 비교·최신 모범 사례·보안 권고·API 마이그레이션·사용자 답변의 "조사 필요" 항목 등) 는 shared `$deepresearch` skill (`~/.codex/skills/deepresearch/SKILL.md`) 을 사용한다.
 
-권장 어댑터 순서:
-
-- `harness-deep-researcher` skill — workflow 안에서 기본
-- `harness-deep-researcher` agent/helper — 사용 가능한 sub-agent/helper 도구가 있을 때
-- 호출자 Codex 직접 수행 — 위 둘이 불가능할 때
-
-리서치 결과는 `.harness/research/research-<slug>-<NN>-<topic>.md` 에 저장하고, 도메인 초안에는 HIGH confidence Key Findings 만 반영한다. 리서치가 필요 없다고 판단하면 `"리서치 필요 없음 — 사유: …"` 를 진행 로그에 남기고 결과 파일은 만들지 않는다.
+리서치 report 는 `.harness/research/` 아래 Markdown 파일로 생성하도록 요청한다. 도메인 초안에는 high-confidence cited findings 만 반영한다. 리서치가 필요 없다고 판단하면 `"리서치 필요 없음 — 사유: …"` 를 진행 로그에 남기고 결과 파일은 만들지 않는다.
 
 ---
 

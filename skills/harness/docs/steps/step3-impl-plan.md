@@ -57,13 +57,13 @@
    - 이미 존재하는 비슷한 패턴(naming, layout, error handling) 확인
    - 결과는 `.harness/implementation-<slug>.md` 작성 시 *"기존 코드 영향 영역"* 섹션으로 반영
    - 탐색 없이 plan 만 만들면 step4 에서 추측 코딩 → 리뷰 fail → step3 무한 루프
-2. **(필요 시) 외부 리서치 — `harness-deep-researcher` 위임** — 다음 중 하나라도 해당하면 plan skill 호출 전에 리서치 실시:
+2. **(필요 시) 외부 리서치 — `$deepresearch` 사용** — 다음 중 하나라도 해당하면 plan skill 호출 전에 리서치 실시:
    - 도입할 라이브러리·API 사용법이 학습 데이터 cutoff 이후 변경된 영역
    - 마이그레이션 비용 / breaking change 영향 평가가 필요
    - 보안 권고(OWASP/NIST/CVE) 가 구현 결정에 직접 영향
    - 도메인 단계의 *"외부 의존성: 조사 필요"* 항목이 미해결로 남음
-   - 위임 방식·산출물 양식은 deep research 절차와 동일 (Topic / Tier / Context / 조사 일자 필드 + `.harness/research/research-<slug>-<NN>-<topic>.md` 저장).
-   - 위임 prompt 는 **[Learning Prepend 계약](../workflow.md#critical-learning-prepend-계약-모든-harness--agent-공통) 1·2·3·4 단계 수행 필수** — `harness-deep-researcher.md` 공용 학습 파일을 실제로 읽기 후 `## Prior Learning (READ FIRST — DO NOT SKIP)` 헤더로 prepend. 누락 시 도우미가 `[BLOCKED]` 로 거부. (2026-05-20: 프로젝트 learning 폐기 — 공용만 prepend.)
+   - shared `$deepresearch` skill 을 호출하고 report 는 `.harness/research/` 아래 Markdown 파일로 생성하도록 요청한다.
+   - Harness 전용 deep-research learning prepend 나 helper/sub-agent 호출은 사용하지 않는다.
    - 불필요하면 *"리서치 필요 없음 — 사유: …"* 한 줄 기록.
 3. `plan` skill 호출 (Codex skill, skill="plan") — 호출자 Codex 가 직접 수행. 2번 리서치 결과 파일은 plan prompt 의 *"참고 자료"* 로 prepend.
 4. **(필요 시) 시스템 차원 검토 — `architect` helper/sub-agent 호출** — 다음 중 하나라도 해당하면 plan 본문 완성 후 Codex 리뷰 *전에* 시스템 차원 검토를 거친다:
@@ -94,15 +94,11 @@
 
 ---
 
-## 외부 리서치 호출 — Single Source (2026-05-20 정합화)
+## 외부 리서치 호출 — Single Source
 
-step3 의 *외부 리서치* 분기 (라이브러리 비교·최신 모범 사례·보안 권고·API 마이그레이션 등 필요 시) 는 [`docs/procedures/deep-research-procedure.md`](../procedures/deep-research-procedure.md) 의 5단계 흐름을 따른다. 다음 3가지 어댑터 중 하나로 위임 (셋 다 동일 procedure):
+step3 의 *외부 리서치* 분기 (라이브러리 비교·최신 모범 사례·보안 권고·API 마이그레이션 등 필요 시) 는 shared `$deepresearch` skill (`~/.codex/skills/deepresearch/SKILL.md`) 을 사용한다.
 
-- `harness-deep-researcher` skill (Codex skill) — workflow 안에서 권장
-- `harness-deep-researcher` agent (사용 가능한 sub-agent/helper 도구) — sub-agent 별도 컨텍스트
-- `/harness-deep-researcher` slash (사용자 진입점 — workflow 내부에선 사용 안 함)
-
-(2026-05-20: `.harness/.noagent` 폐기. `harness-deep-researcher` skill 또는 동명 helper/sub-agent 호출 — 본 워크플로우는 Codex skill 호출이 기본.)
+Report 경로는 progress 에 기록하고 plan prompt 의 *"참고 자료"* 로 prepend 한다. `$deepresearch` 가 정한 pass tier, source rules, high-stakes rules, report naming, completion criteria 를 그대로 따른다.
 
 ---
 
