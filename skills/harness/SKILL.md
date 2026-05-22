@@ -146,6 +146,19 @@ step1 초기화: `.harness/.noask` 빈 파일 생성 (`.harness/.ask` 가 있으
 
 ---
 
+## CRITICAL: Codex App sub-agent authorization bridge
+
+`/harness` and `/harness-ask` are explicit user authorization to use sub-agents for Harness Step6 QA and Step7 customer validation. The same is true once this Harness skill has been loaded and the input gate has passed, including resumed handoff invocations such as `Harness <handoff-path>`. During a Harness run, do not ask for extra sub-agent permission and do not claim that the current user message lacks explicit sub-agent approval.
+
+Codex App may expose only generic runtime agent types (`worker`, `default`, `explorer`). Custom Harness agents are not selected by `agent_type`; they are loaded by prompt:
+
+1. Call the available sub-agent spawn tool with `agent_type="worker"` for `harness-qa-engineer` or `harness-customer-user` (`default` only if `worker` is unavailable).
+2. Read `~/.codex/agents/<agent-name>.md` or fallback `~/.codex/skills/harness/agents/<agent-name>.md`.
+3. Include the full agent spec in the spawned prompt and state: `You are acting as <agent-name> according to the Harness agent spec below.`
+4. Include Prior Learning, test guide, main `.harness/` path, runtime target, and canonical output path.
+5. If the worker returns the report body instead of writing it into the caller workspace, save that worker-produced body verbatim. Do not create the persona verdict in the caller session.
+6. If no spawn tool is exposed, record `BLOCKED / DEPENDENCY_MISSING`; if spawn is exposed, direct caller fallback is forbidden.
+
 ## docs/ 안내판
 
 | 파일 | 내용 |

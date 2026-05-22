@@ -18,6 +18,14 @@
 
 ---
 
+## 0. Sub-agent 승인 오판
+
+- `/harness`, `/harness-ask`, active Harness handoff/resume invocation, 또는 `harness-customer-user` skill 호출 후에 "subagent 사용이 명시 승인되지 않았다"고 말하지 않는다. 해당 호출 자체가 Step6/Step7 sub-agent delegation 승인이다.
+- Codex App에서 custom agent 이름을 `agent_type`으로 넣지 않는다. `worker` 또는 `default`로 spawn하고, `~/.codex/agents/<agent-name>.md` 전문을 prompt에 넣어 역할을 부여한다.
+- sub-agent spawn 도구가 노출되어 있는데도 호출자 Codex가 직접 QA/customer persona를 수행하지 않는다. 도구가 전혀 없을 때만 `BLOCKED / DEPENDENCY_MISSING`이다.
+
+---
+
 ## 1. 사용자 의도·범위
 
 - **하이레벨 기능 변경 금지** — 사용자 동의 없이 기능을 바꾸지 않는다 (`/harness-ask` 모드에서만 `request_user_input 또는 일반 질문` 으로 동의 받음).

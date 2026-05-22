@@ -1,5 +1,21 @@
 # /harness Workflow
 
+### CRITICAL: Codex App sub-agent runtime bridge
+
+`/harness` and `/harness-ask` are explicit user authorization to delegate Step6 and Step7 to sub-agents. The same is true after this Harness skill has been loaded and its input gate has passed, including resumed handoff invocations such as `Harness <handoff-path>`. A Harness run must never say "subagent use was not explicitly approved" after the Harness workflow is active.
+
+Codex App runtimes may expose only generic sub-agent types such as `worker`, `default`, or `explorer`. In that runtime, custom Harness agents are loaded by prompt, not by `agent_type`.
+
+Required bridge:
+
+1. Use the available sub-agent tool (`spawn_agent` / `multi_agent_v1.spawn_agent` equivalent) with `agent_type="worker"` for `harness-qa-engineer` and `harness-customer-user`. If `worker` is not offered but `default` is offered, use `agent_type="default"`.
+2. Never pass `agent_type="harness-qa-engineer"` or `agent_type="harness-customer-user"` unless the runtime explicitly lists those exact values as valid agent types.
+3. Read the matching custom agent spec from `~/.codex/agents/<agent-name>.md` first. If missing, read `~/.codex/skills/harness/agents/<agent-name>.md`.
+4. Put the full agent spec into the spawned worker prompt with this sentence before it: `You are acting as <agent-name> according to the Harness agent spec below.`
+5. Prepend Prior Learning, the full `test-guide-<slug>.md`, main repo `.harness/` absolute path, runtime target details, and the required output path.
+6. If the spawned worker cannot write into the caller workspace, it must return the full report body. The caller may only save that verbatim worker-produced report to the canonical output path; the caller must not author the QA/customer verdict.
+7. If no sub-agent spawning tool is exposed at all, record `BLOCKED / DEPENDENCY_MISSING`. If the tool is exposed, direct caller execution is forbidden.
+
 ### CRITICAL: sub-agent 강제 계약
 
 `harness-qa-engineer` 와 `harness-customer-user` 는 호출자 Codex가 직접 대체할 수 없다.

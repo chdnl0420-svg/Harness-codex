@@ -9,6 +9,19 @@ This skill is a **subagent dispatcher**, not a direct-test fallback.
 
 When step7 needs customer validation, the caller Codex must invoke the `harness-customer-user` subagent/helper with the required context. The caller Codex may build, install, launch, clean up, and read the final report, but must not role-play the customer persona or produce a PASS/FAIL customer verdict itself.
 
+## Explicit Subagent Authorization
+
+Calling this skill is an explicit user request for sub-agent delegation. Do not ask for extra permission and do not say that subagent use was not explicitly approved.
+
+Codex App bridge:
+
+1. Use the available sub-agent spawn tool with `agent_type="worker"` (`default` only if `worker` is unavailable).
+2. Do not pass `agent_type="harness-customer-user"` unless the runtime explicitly lists that exact value as valid.
+3. Read `~/.codex/agents/harness-customer-user.md` first; if missing, read `~/.codex/skills/harness/agents/harness-customer-user.md`.
+4. Include the full agent spec in the spawned prompt after: `You are acting as harness-customer-user according to the Harness agent spec below.`
+5. Include Prior Learning, full test guide, production launch details, main repo `.harness/` path, and the output path.
+6. If the spawned worker returns the report body instead of writing the file, save that body verbatim. Do not author or alter the customer persona verdict in the caller session.
+
 ## Required Flow
 
 1. Caller Codex verifies the step7 gate:

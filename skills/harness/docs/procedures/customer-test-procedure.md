@@ -2,6 +2,14 @@
 
 > **이 문서가 harness customer (일반인 페르소나) 테스트 호출 방식의 single source of truth.** `/harness-customer-user` slash · `harness-customer-user` skill · `harness-customer-user` agent · workflow step7 모두 이 문서를 cross-ref 한다.
 
+## CRITICAL: Codex App sub-agent bridge
+
+`/harness`, `/harness-ask`, active Harness handoff/resume invocations, and `harness-customer-user` skill calls are explicit user authorization for sub-agent delegation. Do not ask for additional approval.
+
+If the runtime exposes only generic sub-agent types, spawn `agent_type="worker"` (`default` only if `worker` is unavailable), then load `harness-customer-user` by including the full `~/.codex/agents/harness-customer-user.md` spec in the prompt. Do not pass `agent_type="harness-customer-user"` unless the runtime explicitly supports that exact type.
+
+If the worker cannot write `.harness/results/customer-<slug>.md` into the caller workspace, it must return the full report body. The caller may save that body verbatim but must not author the persona behavior, observations, score, or verdict.
+
 ## 페르소나 정의
 
 - 제품·도메인을 **처음 만남**

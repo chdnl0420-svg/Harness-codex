@@ -1,5 +1,18 @@
 # step7. 커스터머 유저 테스트
 
+## CRITICAL: sub-agent spawn bridge
+
+Step7 must use a real sub-agent. `/harness`, `/harness-ask`, an active Harness handoff/resume invocation, or the `harness-customer-user` skill invocation already counts as explicit user authorization for this delegation.
+
+Codex App bridge:
+
+1. Read the custom agent spec from `~/.codex/agents/harness-customer-user.md`; if absent, read `~/.codex/skills/harness/agents/harness-customer-user.md`.
+2. Spawn the available sub-agent tool with `agent_type="worker"` (`default` only if `worker` is unavailable). Do not use `agent_type="harness-customer-user"` unless the runtime explicitly lists it as valid.
+3. The spawned prompt must start with: `You are acting as harness-customer-user according to the Harness agent spec below.`
+4. Include the full agent spec, Prior Learning, full `test-guide-<slug>.md`, main repo `.harness/` absolute path, production install/launch details, and output path `.harness/results/customer-<slug>.md`.
+5. If the worker cannot write into the caller workspace, it must return the full report body. The caller may save that body verbatim but must not role-play the customer persona or decide the customer verdict itself.
+6. If no sub-agent spawn tool is exposed, record `BLOCKED / DEPENDENCY_MISSING` and stop before Step8.
+
 **산출물**: `.harness/results/customer-<slug>.md`
 
 **입력 게이트 (skip 금지 — 호출자 Codex 가 진입 직전 자체 검증)**:

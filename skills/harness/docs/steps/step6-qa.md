@@ -1,5 +1,18 @@
 # step6. QA 테스트
 
+## CRITICAL: sub-agent spawn bridge
+
+Step6 must use a real sub-agent. `/harness`, `/harness-ask`, or an active Harness handoff/resume invocation already counts as explicit user authorization for this delegation.
+
+Codex App bridge:
+
+1. Read the custom agent spec from `~/.codex/agents/harness-qa-engineer.md`; if absent, read `~/.codex/skills/harness/agents/harness-qa-engineer.md`.
+2. Spawn the available sub-agent tool with `agent_type="worker"` (`default` only if `worker` is unavailable). Do not use `agent_type="harness-qa-engineer"` unless the runtime explicitly lists it as valid.
+3. The spawned prompt must start with: `You are acting as harness-qa-engineer according to the Harness agent spec below.`
+4. Include the full agent spec, Prior Learning, full `test-guide-<slug>.md`, main repo `.harness/` absolute path, executable/URL/runtime details, and output path `.harness/results/qa-<slug>.md`.
+5. If the worker cannot write into the caller workspace, it must return the full report body. The caller may save that body verbatim but must not decide PASS/FAIL/BLOCKED itself.
+6. If no sub-agent spawn tool is exposed, record `BLOCKED / DEPENDENCY_MISSING` and stop before Step7.
+
 **산출물**:
 - `.harness/test-guide-<slug>.md` (테스트 가이드 — 작성/갱신)
 - `.harness/results/qa-<slug>.md` (QA 보고서 — 회차 누적)
