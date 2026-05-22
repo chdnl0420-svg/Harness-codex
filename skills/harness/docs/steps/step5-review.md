@@ -30,7 +30,13 @@
    - 호출 방식: 사용 가능한 보안 리뷰 skill/helper가 있으면 우선 사용한다. 없으면 호출자 Codex가 같은 기준으로 직접 검토한다. 응답에 CRITICAL 1건이라도 있으면 LGTM: NO 자동 강등.
    - 결과는 `review-<slug>.md` 의 *"보안 게이트"* 섹션으로 누적.
 4. 결과를 `review-<slug>.md` 에 누적
-5. LGTM 판정 → 흐름 다이어그램 분기 따름
+5. **run ordering + latest pointer 검증 (CRITICAL)** — 리뷰 회차를 기록하기 전에 `.harness/state.json.latest_review.run` 과 `.harness/events.ndjson` 의 마지막 `review_completed` 이벤트를 확인한다.
+   - 새 `run_number` 는 직전 run + 1 이어야 한다. 직전 run 보다 작거나 같은 번호가 append 되면 즉시 중단한다.
+   - verdict enum 은 `LGTM YES | LGTM NO | BLOCKED | UNKNOWN` 만 허용한다.
+   - 최신 판정은 `review-<slug>.md` 의 마지막 블록이 아니라 `state.json.latest_review` 기준이다.
+   - `review_completed` 이벤트를 `events.ndjson` 에 append 한 뒤 `state.json.latest_review` 를 갱신한다.
+   - progress 상단의 `latest_review_run`, `latest_review_verdict` 도 `state.json.latest_review` 값과 같아야 한다.
+6. LGTM 판정 → 흐름 다이어그램 분기 따름
    - LGTM: YES → step6 (QA 테스트) 로 진행
    - LGTM: NO → step3 (구현 계획 수정) 로 되돌림. **동일 (유형 enum, 파일경로) 조합으로 LGTM:NO 가 5회 반복될 때만** 중단 + 사용자에게 알림. 매번 다른 문제가 발생하면 카운터는 *동일 문제* 로 누적되지 않으므로 계속 진행.
 
@@ -59,10 +65,12 @@
 ```markdown
 ## Run #<N> — <날짜·시간>
 - 리뷰어: Codex | code-review skill
-- 추출된 판정: LGTM YES | LGTM NO
+- run_number: <N>
+- 추출된 판정: LGTM YES | LGTM NO | BLOCKED | UNKNOWN
 - 판정 근거: <응답 본문에서 라벨이 등장한 줄 인용 또는 "라벨 없음">
 - 주요 지적: <목록>
 - 다음 행동: step6 진입 | step3 회송
+- state_update: latest_review.run=<N>, latest_review.verdict=<verdict>
 ```
 
 ## CRITICAL: 다음 step 결정 보고 (게이트 — 출력 없이 다음 step 진입 금지)
@@ -71,9 +79,11 @@
 
 ```
 ### Step5 결과 → 다음 step 결정
-- 판정: LGTM YES | LGTM NO | LGTM UNKNOWN
+- 판정: LGTM YES | LGTM NO | BLOCKED | UNKNOWN
 - 판정 근거: <review-<slug>.md Run #N 의 "판정 근거" 줄 그대로 인용>
 - 다음 step: step6 진입 | step3 회송 | 슬러그 일시정지
+- run ordering 검증: previous_run=<N-1|null>, current_run=<N>, result=PASS|FAIL
+- latest_review pointer: state.json.latest_review.run=<N>, verdict=<verdict>
 - 이번 루프 회차: <progress-<slug>.md 의 step5 LGTM:NO 누적 카운터>회 (동일 문제 유형 enum = YES | NO)
 - 자기 점검 (자체 수정 우회): 이번 fail 후 호출자 Codex 가 코드/구현 파일을 직접 수정했는가? YES | NO  (※ git diff 자동 검증 — workflow.md "회송 경로 실행 보장 (3)" 참조)
 - fallback_used: Codex | code-review skill (self-review) | none
@@ -84,8 +94,9 @@
 - 위 자기 점검이 `YES` 이거나 git diff 자동 검증과 불일치하면 **즉시 워크플로우 중단**. `review-<slug>.md` 에 "정책 위반: 메인 자체 수정 우회 — workflow 중단" 기록 후 사용자에게 보고. (자체 수정한 변경분을 step3 회송 절차에서 정식 plan 으로 반영해야 함 — 메인이 LGTM:YES 처리하는 anti-pattern 차단)
 - **fallback = code-review skill (self-review) 이고 assistant 제거 = NO 이고 판정 = LGTM YES 면 → LGTM:UNKNOWN 으로 강등** + 슬러그 일시정지. self-review 의 ECE 39–74% (arXiv 2508.06225) 로 인해 LGTM:YES 신뢰 불가. Anthropic auto-mode 의 *입력 컨텍스트 분리* 와 동일 원칙으로, assistant 메시지를 입력에서 제거한 별도 호출 (assistant 제거 = YES) 만 LGTM:YES 허용.
 - "이번 루프 회차" 가 5 이상이고 "동일 문제 유형 enum = YES" 이면 **자동 중단** + report 에 "동일 문제 5회 반복으로 자동 중단" 기록. 유형 enum 은 workflow.md "회송 경로 실행 보장 (5)" 의 13종 중 하나.
+- run ordering 검증이 FAIL 이면 다음 step 에 진입하지 않는다. `review-<slug>.md` 에 "run ordering violation" 을 기록하고 `state.json.blocked.reason_enum=OTHER` 로 중단한다.
 - 그 외 LGTM:NO 면 step3 회송 분기로 진입 — Step3 의 "회송 진입 모드" 절차에 따라 진행.
-- LGTM:UNKNOWN 이면 다음 step 진입하지 않고 슬러그를 `paused-by-unknown` 으로 마킹 + report 에 사유 기록. 무인 모드(noask) 면 다음 슬러그 자동 시작.
+- UNKNOWN 이면 다음 step 진입하지 않고 슬러그를 `paused-by-unknown` 으로 마킹 + report 에 사유 기록. 무인 모드(noask) 면 다음 슬러그 자동 시작.
 
 ## 루프 카운터 누적 의무 (CRITICAL)
 

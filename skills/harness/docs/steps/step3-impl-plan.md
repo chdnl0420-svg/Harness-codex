@@ -148,9 +148,21 @@ mode: single | chunks (chunks=N, 분해 사유: <어떤 신호 어떤 값>)
 | 의존 chunks | 이 chunk 가 의존하는 chunk_id 목록 |
 | 변경 대상 파일 | 예상 파일 경로 목록 |
 | 성공 기준 | 이 chunk 완료 시 *관찰 가능한 결과* 1줄 |
-| 상태 | `pending` / `in-progress` / `done` / `paused` |
+| 상태 | `pending` / `in-progress` / `done` / `blocked` / `paused` |
 
 분해 사유, 의존성 그래프 (가능하면 ASCII 박스 또는 inline SVG) 도 포함.
+
+### BLOCKED propagation (CRITICAL)
+
+Step2 `Domain Contract` 의 `missing contract` 또는 step3 사전 탐색에서 구현 전 계약 부재가 발견되면 해당 chunk 는 구현 가능한 `pending` 이 아니다. 다음 표면을 동시에 갱신한다.
+
+- `.harness/state.json`: `blocked.is_blocked=true`, `blocked.reason_enum=CONTRACT_MISSING | DEPENDENCY_MISSING`, `blocked.chunk=<chunk-N>`, `blocked.required_unblock=[...]`
+- `.harness/events.ndjson`: `{"type":"blocked","reason_enum":"CONTRACT_MISSING","chunk":<N>,...}`
+- `.harness/progress/progress-<slug>.md`: current chunk/status/reason 을 BLOCKED 로 기록
+- `implementation-<slug>-chunks-overview.html`: 해당 chunk 상태를 `blocked` 로 표시하고 retry 조건을 적음
+- `.harness/export/<slug>-handoff.md` 또는 tracked `docs/progress/<slug>-summary.md`: BLOCKED 사유와 retry 조건 기록
+
+overview 에 `pending` 과 `blocked` 가 같은 chunk 에 동시에 존재하면 validation 실패다.
 
 ### Step 4: 첫 chunk 의 implementation plan 작성
 

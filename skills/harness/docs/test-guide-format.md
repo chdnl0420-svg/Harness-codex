@@ -33,6 +33,7 @@
 - 입력/조작: ...
 - 기대 결과: ...
 - 측정 가능한 성공 기준 (예: 메시지 노출, 상태 변경, 응답 시간 등)
+- 요구 evidence type: <screenshot | click_trace | dom_assertion | network_trace | ipc_trace | persisted_state_trace | restore_trace | unit_test | static_assertion | computed_style_assertion 조합>
 
 ### F2: ...
 
@@ -47,6 +48,12 @@
 
 ## 비목표 / 테스트 범위 밖
 PRD 비목표·MVP 제외 사항. 도우미가 이걸 검증하려고 시간 쓰지 않게.
+
+## QA 격리 / persistent state
+- 격리 방식: 별도 userData | localStorage/sessionStorage snapshot+restore | 해당 없음
+- snapshot 대상 key: <목록 또는 없음>
+- restore 필수 여부: YES | NO
+- persistent state 를 변경하는 시나리오는 `persisted_state_trace + restore_trace` 없이는 PASS 불가.
 
 ## 변경 이력
 - v1 (YYYY-MM-DD HH:MM) — 최초 작성

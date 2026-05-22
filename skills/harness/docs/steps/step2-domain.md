@@ -25,6 +25,39 @@
 6. (ask 모드 한정) 수정 의견 시 1번(`harness-plan-ask`) 재호출, 단순 질문 시 답변만 하고 다시 승인 질문, 취소 시 워크플로우 중단.
 7. 파일 작성 (`.harness/domain-<slug>.html`) → step3 로
 
+## CRITICAL: Domain Contract 게이트
+
+Step2 도메인 산출물은 `Domain Contract` 섹션을 반드시 포함한다. 단순 요구 요약은 DDD(도메인 주도 설계: 구현 전 업무 경계와 계약을 먼저 고정하는 방식) 로 인정하지 않는다.
+
+필수 항목:
+
+- bounded context: 이번 작업이 속한 업무/시스템 경계
+- 주요 도메인 용어: 코드명이 아니라 사용자가 이해하는 핵심 개념
+- 변경 가능한 계약: 이번 작업에서 수정 가능한 타입/API/UI 계약
+- 변경 금지 경계: 수정하면 안 되는 디렉터리, 계층, 외부 시스템
+- upstream/downstream 의존성: 선행 계약과 후속 영향
+- missing contract: 아직 존재하지 않아 구현을 막는 계약
+- 구현 전 block 조건: 구현 시작 전에 충족되어야 하는 조건
+
+예시:
+
+```markdown
+## Domain Contract
+- Bounded context: Session launch
+- Terms: Session, Backend, Worktree, PermissionMode
+- May edit: src/renderer/**
+- Must not edit: src/main/**, src/shared/**
+- Upstream/downstream: Plan A backend contract → renderer selector
+- Missing contract: BgSession.backend, NewSessionInput.backend
+- Block before implementation: missing contract 존재 시 관련 chunk BLOCKED
+```
+
+검증 규칙:
+
+- `missing contract` 가 비어 있지 않으면 관련 chunk 는 step3 에서 자동 `BLOCKED / CONTRACT_MISSING` 또는 `BLOCKED / DEPENDENCY_MISSING` 으로 표시한다.
+- 도메인 경계 위반 파일이 step4 diff 에 포함되면 step4 완료 불가다.
+- Domain Contract 섹션이 없으면 step3 진입 금지. noask 모드라도 step2 산출물을 재작성한다.
+
 ## 외부 리서치 호출 — Single Source
 
 step2 의 *외부 리서치* 분기 (라이브러리 비교·최신 모범 사례·보안 권고·API 마이그레이션·사용자 답변의 "조사 필요" 항목 등) 는 [`docs/procedures/deep-research-procedure.md`](../procedures/deep-research-procedure.md) 의 5단계 흐름을 따른다.

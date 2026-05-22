@@ -6,7 +6,7 @@
    - `git rev-parse --git-common-dir` 로 공통 git 디렉토리 경로 획득. 두 값이 다르면 **현재 위치는 worktree 안**.
    - worktree 안이면 `.harness/` 의 정식 위치는 **공통 git 디렉토리의 부모(메인 repo 루트)** 로 고정한다. 이후 모든 step 이 그 경로를 `$HARNESS_PROJECT_DIR` 로 사용 (worktree 안에 별도 `.harness/` 만들지 않는다 — 자료가 둘로 갈라짐).
    - 일반 repo (worktree 아님) 면 `git rev-parse --show-toplevel` 결과를 그대로 사용.
-3. **프로젝트 산출물 폴더 보장** — 메인 repo 경로의 `.harness/{progress,reviews,results,research}` 디렉토리만 mkdir. 마스터의 `core/`, `wrappers/` 코드 복사 *폐기* (2026-05-20 정합화 — 마스터가 진실 원천, 프로젝트엔 산출물 (md/html) 만 존재).
+3. **프로젝트 산출물 폴더 보장** — 메인 repo 경로의 `.harness/{progress,reviews,results,research,tests,export}` 디렉토리만 mkdir. 마스터의 `core/`, `wrappers/` 코드 복사 *폐기* (2026-05-20 정합화 — 마스터가 진실 원천, 프로젝트엔 산출물 (md/html/json/ndjson) 만 존재).
 4. **harness-* helper 가용성 확인 + 안전 폴백** — 본 워크플로우가 사용할 harness-* helper 또는 Codex skill 가용성을 확인하고, **부재 항목은 안전 폴백 경로로 대체**한다. 자동 복구를 약속하지 않는다.
 
    | 호출 대상 | 위치 | 부재 시 폴백 |
@@ -28,7 +28,45 @@
    - skill `plan` (step3 구현 계획), `code-review` (step5 fallback), `security-review` (보안 게이트), `tdd` (TDD 모드 사이클), `build-fix` (step4 빌드 에러)
    - 사용 가능한 sub-agent/helper: `architect`, `code-reviewer`, `security-reviewer`, `tdd-guide`, 언어별 `*-build-resolver`
 7. **legacy 폴더·마커 cleanup** — `.harness/.noagent`, `.harness/agents/`, `.harness/core/`, `.harness/wrappers/`, `.harness/plans/`, `.harness/improvements/` 가 보이면 *방치* (사용자 자료 보호 — 자동 삭제 안 함). 모두 2026-05-20 폐기됐고 워크플로우가 사용 안 함. 사용자가 정리 원하면 수동 `rm -rf` 안내.
-8. **progress 파일 부트스트랩** — `.harness/progress/progress-<slug>.md` 를 다음 양식으로 생성. 이후 step 들이 이 파일에 섹션 append.
+8. **canonical state + event log 부트스트랩 (CRITICAL)** — `.harness/state.json` 과 `.harness/events.ndjson` 를 생성한다. `state.json` 은 최신 상태의 단일 진실원이고, `events.ndjson` 는 append-only 변경 이력이다. 사람이 읽는 progress summary 와 `state.json` 이 불일치하면 `state.json` 을 기준으로 progress 를 정정하거나 워크플로우를 중단한다.
+
+   - `state.json` 필수 필드: `slug`, `mode`, `current_step`, `current_chunk`, `chunks_total`, `latest_review`, `latest_qa`, `loop_counters`, `blocked`.
+   - `events.ndjson` 필수 이벤트: `workflow_started`, `step_changed`, `review_completed`, `qa_completed`, `blocked`, `handoff_exported`.
+   - 모든 step 전환은 먼저 `events.ndjson` 에 append 한 뒤 `state.json` 최신 포인터를 갱신한다.
+   - Run 번호·loop counter 는 `state.json` 에서만 증가시키고 progress 는 그 값을 복사한다.
+
+   초기 `state.json`:
+
+   ```json
+   {
+     "slug": "<slug>",
+     "mode": "noask",
+     "current_step": "step1",
+     "current_chunk": null,
+     "chunks_total": null,
+     "latest_review": null,
+     "latest_qa": null,
+     "loop_counters": {
+       "step5_lgtm_no": 0,
+       "step6_fail": 0,
+       "step6_blocked": 0
+     },
+     "blocked": {
+       "is_blocked": false,
+       "reason_enum": null,
+       "chunk": null,
+       "required_unblock": []
+     }
+   }
+   ```
+
+   초기 `events.ndjson`:
+
+   ```json
+   {"ts":"<ISO_TIMESTAMP>","type":"workflow_started","slug":"<slug>","mode":"noask"}
+   ```
+
+9. **progress 파일 부트스트랩** — `.harness/progress/progress-<slug>.md` 를 다음 양식으로 생성. 이후 step 들이 이 파일에 섹션 append.
 
    ```markdown
    # progress-<slug>
@@ -38,6 +76,13 @@
    - 모드: noask | ask
    - 한 줄 목표: <사용자 원본 한 줄 목표>
    - auto_triggered_from: <원본 slug> | (없음)   # step7 → 신규 워크플로우 chain 일 때만 채움. 존재하면 complete 진입 게이트에서 C 선택지 비활성 (무한 chain 차단)
+   - state: .harness/state.json
+   - events: .harness/events.ndjson
+   - latest_review_run: null
+   - latest_review_verdict: null
+   - current_chunk: null
+   - current_chunk_status: null
+   - current_chunk_blocked_reason: null
 
    ## Loop Counter
    - step5 LGTM:NO 누적: 0회

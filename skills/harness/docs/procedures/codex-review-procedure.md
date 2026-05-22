@@ -59,6 +59,16 @@ codex exec --sandbox workspace-write \
 
 Codex 가 자체 file-read 도구로 파일을 읽고 *적절한 형식* (코드 리뷰 → CRITICAL/HIGH/MEDIUM 분류, plan critique → Missing Pieces/Hidden Risks 등) 으로 result.md 작성. 호출자가 형식을 강제하지 않는다.
 
+## Run Ordering + latest_review 갱신
+
+리뷰 결과를 aggregate 문서에 반영할 때 호출자 Codex 는 다음을 검증한다.
+
+1. `.harness/state.json.latest_review.run` 과 `.harness/events.ndjson` 의 마지막 `review_completed` 이벤트를 읽는다.
+2. 새 `run_number` 는 직전 run + 1 이어야 한다. Run #7 뒤 Run #6 처럼 역전 append 되거나 같은 run 번호가 재사용되면 즉시 중단한다.
+3. verdict 는 `LGTM YES | LGTM NO | BLOCKED | UNKNOWN` 중 하나만 기록한다.
+4. `LGTM YES` 는 결과 본문에 명시적 라벨이 있을 때만 인정한다. 라벨이 없으면 `LGTM NO` 또는 `UNKNOWN` 이다.
+5. `events.ndjson` 에 `{"type":"review_completed",...}` 를 append 한 뒤 `state.json.latest_review` 와 progress 상단 `latest_review_run/latest_review_verdict` 를 갱신한다.
+
 ## 금지 패턴
 
 - ❌ 프롬프트에 focus / mode / instructions / output format 지시 추가

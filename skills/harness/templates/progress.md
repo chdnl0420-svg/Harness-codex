@@ -15,6 +15,13 @@ qa_count: 0
 research_count: 0
 files_created: []
 files_modified: []
+state_file: .harness/state.json
+event_log: .harness/events.ndjson
+latest_review_run: null
+latest_review_verdict: null
+current_chunk: null
+current_chunk_status: null
+current_chunk_blocked_reason: null
 ---
 
 # Progress: <slug>
@@ -25,6 +32,11 @@ files_modified: []
 - Mode: noask | ask
 - Harness project dir: <absolute path>
 - Next action: <one concrete action>
+- Canonical state: `.harness/state.json`
+- Event log: `.harness/events.ndjson`
+- Latest review: run <N|null>, verdict <LGTM YES | LGTM NO | BLOCKED | UNKNOWN | null>
+- Current chunk: <chunk-N|null>, status <pending | in-progress | done | blocked | paused | null>
+- Blocked reason: <DEPENDENCY_MISSING | EVIDENCE_GATE_FAIL | PERMISSION_DENIED | GUIDE_MISSING | ENV_UNREACHABLE | CONTRACT_MISSING | TDD_MISSING | OTHER | null>
 
 ## Step Completion
 
@@ -43,6 +55,8 @@ files_modified: []
 - step5 LGTM:NO 누적: 0회
 - step6 FAIL 누적: 0회
 - step6 BLOCKED 누적: 0회
+
+> 위 summary 와 Loop Counter 는 `.harness/state.json` 값과 일치해야 한다. 불일치 시 `state.json` 을 기준으로 정정하거나 워크플로우를 중단한다.
 
 ## Artifacts
 

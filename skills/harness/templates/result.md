@@ -73,6 +73,16 @@ critique_method: <codex | code-review-skill | self-only>
 | QA | `results/qa-<id>.md` |
 | Customer | `results/customer-<id>.md` |
 | **Final report** | **`results/report-<id>.html`** |
+| Canonical state | `state.json` |
+| Event log | `events.ndjson` |
+| Handoff export | `export/<id>-handoff.md` 또는 `docs/progress/<id>-summary.md` |
+
+## Handoff Summary
+
+- latest_review: <run/verdict/result_path>
+- latest_qa: <verdict/result_path/evidence_matrix summary>
+- blocked: <none | reason_enum + retry_condition>
+- commit_hash: <hash | not committed>
 
 ## Cost Summary
 

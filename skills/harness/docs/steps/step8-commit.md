@@ -26,6 +26,14 @@ step6/step7 미통과 상태에서 step8 직진을 차단하는 강제 게이트
 
 5. **Chunks 모드** 의 chunk 별 incremental commit (line 17 이하) 도 동일 게이트 적용. chunk 별 step6 PASS 여야 chunk commit 가능. last chunk 의 step8 만 step7 보고서까지 요구.
 
+6. **handoff export 게이트 (CRITICAL)** — `.harness/` 가 ignored 인 프로젝트에서도 판단 근거가 사라지지 않도록 commit 전 또는 BLOCKED 종료 전 handoff artifact 를 생성한다.
+   - 기본 tracked 경로: `docs/progress/<slug>-summary.md`
+   - 보조 ignored 경로: `.harness/export/<slug>-handoff.md`
+   - 대상 프로젝트가 `docs/` 를 원하지 않거나 tracked 파일 생성을 금지하면 PR description 에 같은 내용을 붙이고, `.harness/export/<slug>-handoff.md` 는 반드시 남긴다.
+   - 필수 내용: 변경 파일, latest verdict, QA evidence 요약, BLOCKED 사유, retry 조건, commit hash 또는 `(not committed)`.
+   - 생성 후 `events.ndjson` 에 `handoff_exported` 이벤트를 append 하고 `state.json` 에 export 경로를 기록한다.
+   - handoff artifact 가 없으면 완료 처리 불가.
+
 **조건**: 게이트 통과 후 실행. push 는 옵트인 (아래 push 정책 참조).
 
 **push 정책 (2026-05-20 신규 — 배포성 부작용 차단)**:
@@ -47,6 +55,10 @@ step6/step7 미통과 상태에서 step8 직진을 차단하는 강제 게이트
    - `.harness/.auto-push` 존재 OR `--push` 플래그 → `git push` 시도
    - 둘 다 부재 → push 생략. 채팅 한 줄 안내: `[step8] 로컬 commit 완료 (push 비활성 — opt-in 필요 시 .harness/.auto-push 생성 또는 /harness --push)`
 4. → complete
+
+## BLOCKED 종료 시 handoff
+
+Step6 또는 Step3 에서 BLOCKED 로 중단되는 경우에도 commit 여부와 무관하게 handoff 를 생성한다. 이 handoff 는 다음 재개자가 왜 멈췄는지 판단하는 최소 감사 추적이다.
 
 ---
 

@@ -10,7 +10,7 @@
 - 페르소나 3개 helper/sub-agent (`harness-deep-researcher` · `harness-qa-engineer` · `harness-customer-user`)
 - harness 가 호출하는 일반 skill/agent (`plan` · `tdd` · `code-review` · `security-review` · `build-fix` · `architect` · `code-reviewer` · `security-reviewer` · `tdd-guide` · 언어별 `*-build-resolver`) 가 harness 컨텍스트에서 산출물 작성 시 — 호출 prompt 에 본 규칙 명시 prepend.
 - harness 호출자 Codex (통합 모드)
-- `.harness/` 디렉터리에 떨어지는 모든 산출물 — domain / implementation / progress / review / research / qa / customer / test-guide / report 등 (분류별 HTML 또는 MD)
+- `.harness/` 디렉터리에 떨어지는 모든 산출물 — domain / implementation / progress / review / research / qa / customer / test-guide / report / state / events / export 등 (분류별 HTML, MD, JSON, NDJSON)
 
 ## 산출물 파일 확장자 (분류별 분기)
 
@@ -18,12 +18,13 @@
 |------|--------|--------|------|
 | **계획 설계 + 종합 보고서** | `.html` | `domain-<slug>` · `implementation-<slug>` · `report-<slug>` | 사람이 읽고 결정 — 탭/대시보드 가치 큼 |
 | **운영 로그·중간 결과·가이드** | `.md` | `progress-<slug>` · `research-*` · `review-<slug>` · `qa-<slug>` · `customer-<slug>` · `test-guide-<slug>` | 회차 누적·기계 입력·중간 산출 |
+| **기계 판독 상태** | `.json` / `.ndjson` | `state.json` · `events.ndjson` | canonical state 와 append-only event log |
 
 예외:
 - `README.md`, `AGENTS.md`, 외부 라이브러리 내부 .md — 그대로 유지.
 - 사용자가 *그 작업에 한정* 명시적으로 다른 형식 요청 — 그 요청 우선.
 
-옛 워크플로우 문서가 다른 확장자를 지시해도 본 분류 규칙이 우선. 4대 UX 기준(아래) 은 HTML 산출물에만 적용.
+옛 워크플로우 문서가 다른 확장자를 지시해도 본 분류 규칙이 우선. 4대 UX 기준(아래) 은 HTML 산출물에만 적용. JSON/NDJSON 산출물은 사람이 읽는 UI가 아니므로 탭/대시보드 규칙 면제.
 
 ## 4대 UX 기준 (모든 HTML 산출물 공통)
 

@@ -6,12 +6,17 @@ Filename: review-<REQUEST_ID>-iter-<N>.md
 ---
 request_id: <REQUEST_ID>
 iteration: <N>
+run_number: <N>
 reviewer: <independent-codex | user-approved | fallback-self-review>
 reviewed_files:
   - <file path 1>
   - <file path 2>
 created: <ISO_TIMESTAMP>
 codex_attempt_exit_code: <0 | 2 | other>  # only relevant if fallback occurred
+verdict: <LGTM YES | LGTM NO | BLOCKED | UNKNOWN>
+previous_run: <N-1 | null>
+run_ordering_check: <PASS | FAIL>
+latest_review_pointer: .harness/state.json#latest_review
 ---
 
 # Code Review (Iteration <N>) — by <Reviewer>
@@ -36,7 +41,15 @@ codex_attempt_exit_code: <0 | 2 | other>  # only relevant if fallback occurred
 
 ## LGTM
 
-<YES | NO>
+<LGTM YES | LGTM NO | BLOCKED | UNKNOWN>
+
+## Run Ordering
+
+- previous_run: <N-1 | null>
+- current_run: <N>
+- result: <PASS | FAIL>
+- event_appended: `.harness/events.ndjson`
+- state_updated: `.harness/state.json.latest_review`
 
 ---
 

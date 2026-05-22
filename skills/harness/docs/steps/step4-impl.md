@@ -7,13 +7,14 @@
 **입력 게이트 (skip 금지)**:
 - `.harness/implementation-<slug>.md` 전문을 **반드시 다시 읽어** 메인 컨텍스트에 올린다.
 - step3 의 5개 필수 섹션 (변경 파일 / 영향 영역 / 단계별 순서 / 테스트 전략 / 위험·롤백) 이 채워져 있는지 확인. 누락 시 step3 로 되돌린다.
+- `.harness/tests/red-<slug>.md` 또는 Chunks 모드의 `.harness/tests/red-<slug>-chunk-<n>.md` 가 존재해야 한다. 없으면 `state.json.blocked.reason_enum=TDD_MISSING` 으로 중단하고 step4 진입 금지.
 
 **흐름** (호출자 Codex 가 직접 구현):
 
 1. **단계별 진행** — `implementation-<slug>.md` 의 *"단계별 구현 순서"* 를 한 단계씩 처리. 한 번에 전체 구현 금지.
 2. 각 단계에서:
    - **읽기 먼저** — 변경 대상 파일을 Read 로 먼저 본다. 추측 편집 금지.
-   - **TDD 권장** — 동작이 측정 가능한 경우 테스트를 먼저 작성(RED) → 구현(GREEN) → 정리(REFACTOR). 사용자가 명시적으로 TDD 면제를 요청한 경우만 생략.
+   - **TDD 필수** — 동작이 측정 가능한 경우 테스트를 먼저 작성(RED) → 구현(GREEN) → 정리(REFACTOR). 사용자가 명시적으로 TDD 면제를 요청해도 Harness run 안에서는 red artifact 없이 step4 진입 불가. 면제 요구는 `TDD_MISSING` BLOCKED 로 기록하고 사용자 결정 흐름으로 보낸다.
    - **TDD 사이클이 막힐 때 일반 도구 호출**: 테스트 작성·구현·refactor 어느 단계든 3회 시도 후 진척이 없으면 `tdd` skill (Codex skill) 또는 `tdd-guide` agent (사용 가능한 sub-agent/helper 도구) 호출. RED → GREEN → REFACTOR 사이클 안내 받음.
    - **빌드/타입체크/lint 등 즉시 검증 가능한 항목**은 단계마다 실행. 실패하면 다음 단계로 넘어가지 않는다.
 3. **변경 기록** — 각 단계 완료 시 `.harness/progress-<slug>.md` 에 다음 형식으로 누적:
@@ -25,6 +26,23 @@
    - 비고: <발견된 문제·skip 한 항목>
    ```
 4. 모든 단계 완료 → step5 로.
+
+## Red Artifact 형식 (CRITICAL)
+
+Step4 전 다음 파일 중 하나를 작성한다.
+
+- 단일 모드: `.harness/tests/red-<slug>.md`
+- Chunks 모드: `.harness/tests/red-<slug>-chunk-<n>.md`
+
+필수 내용:
+
+- 실패시킬 동작
+- 실행 명령
+- 기대 실패 메시지 또는 실패 관찰 기준
+- 구현 후 기대 PASS 조건
+- evidence type (`unit_test`, `component_test`, `Electron CDP scenario`, `Playwright scenario`, `IPC contract test` 중 하나)
+
+정적 grep/assertion 은 pure validation helper 보조 검증으로만 허용한다. 사용자 흐름, async state, persistence, IPC 시나리오의 TDD red evidence 로는 인정하지 않는다.
 
 **제약 (`donot.md` 참조)**:
 - *"동작할 것 같다"* 로 다음 단계 진행 금지. 검증 통과 후에만 진행.

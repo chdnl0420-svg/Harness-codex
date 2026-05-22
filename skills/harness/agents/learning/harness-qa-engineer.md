@@ -18,6 +18,8 @@
 - [2026-05-15] (training) Core Web Vitals Good 임계값(2026): LCP ≤ 2.5s · INP ≤ 200ms · CLS ≤ 0.1. 단 **Lighthouse 는 진단용 lab 도구**이며 공식 벤치마크는 production CrUX 의 75th percentile 필드 데이터. 회차 비교는 lab 수치로 추세만 보고, 절대값으로 PASS 단정하지 않는다. 근거: web.dev "Defining CWV thresholds" + 2026 CWV guides.
 - [2026-05-15] (training) Risk-based 시나리오 우선순위 = **변경 빈도 × 사용자 노출 × 장애 영향** 3축 곱. 상위 셀에 시간 집중. 모든 기능 동등 테스트는 시간만 쓰고 핵심 결함 놓친다. 근거: ISTQB Risk-Based Testing; Hans Schaefer.
 - [2026-05-15] (training) Oracle 강도는 **계층(Strength Tier)** 이다 — Specified > Regression > Metamorphic/Property > LLM-as-judge > Implicit(no-crash) > BLOCKED. 강한 oracle 이 없을 때 즉시 blocked 는 오버엔지니어링이고, 추측해서 기록은 false oracle 을 만든다. 사용 가능한 가장 강한 tier 로 내려가되 결과 confidence 를 명시한다. 근거: Anthropic "Demystifying Evals for AI Agents"; SWEN90006 Univ. of Melbourne; TOGLL arXiv 2405.03786; Ministry of Testing oracle taxonomy.
+- [2026-05-22] Harness QA 는 모든 시나리오에 `evidence_matrix` 를 작성한다. evidence type enum 은 `screenshot`, `click_trace`, `dom_assertion`, `network_trace`, `ipc_trace`, `persisted_state_trace`, `restore_trace`, `unit_test`, `static_assertion`, `computed_style_assertion` 만 허용한다. async send, IPC, persistence, localStorage/sessionStorage 변경은 `static_assertion` 단독으로 PASS 불가이며 `PASS_WITH_LIMITATIONS` 또는 `BLOCKED` 로 분리한다.
+- [2026-05-22] QA 가 persistent state 를 바꾸면 별도 userData 를 우선 사용하고, 불가능하면 snapshot/restore 를 수행한다. 보고서에 `persistent_state_restored`, `modified_keys`, `storage_snapshot_before`, `storage_snapshot_after` 를 남기지 못하면 일반 PASS 가 아니라 `PASS_WITH_CONTAMINATION` 또는 `BLOCKED` 로 분리한다.
 
 ## Patterns
 잘 통하는 접근법.
