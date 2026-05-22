@@ -32,6 +32,7 @@ Default behavior:
   - `harness-customer-user`
   - `harness-deep-researcher`
   - `harness-qa-engineer`
+- The repository distribution layout mirrors `$CODEX_HOME`: root `skills/` contains skills, root `agents/` contains custom-agent registry files. Do not create nested `.codex/agents` inside this repository.
 - Move existing managed Harness skills and old `ecc-command-harness*` wrappers to `$CODEX_HOME/harness-update-backups/<timestamp>` before replacement.
 - Move existing managed Harness custom-agent files to `$CODEX_HOME/harness-update-backups/<timestamp>/agents/` before replacement.
 - Install only the Codex-supported surface.
