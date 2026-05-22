@@ -6,7 +6,7 @@
    - `git rev-parse --git-common-dir` 로 공통 git 디렉토리 경로 획득. 두 값이 다르면 **현재 위치는 worktree 안**.
    - worktree 안이면 `.harness/` 의 정식 위치는 **공통 git 디렉토리의 부모(메인 repo 루트)** 로 고정한다. 이후 모든 step 이 그 경로를 `$HARNESS_PROJECT_DIR` 로 사용 (worktree 안에 별도 `.harness/` 만들지 않는다 — 자료가 둘로 갈라짐).
    - 일반 repo (worktree 아님) 면 `git rev-parse --show-toplevel` 결과를 그대로 사용.
-3. **프로젝트 산출물 폴더 보장** — 메인 repo 경로의 `.harness/{progress,reviews,results,research,tests,export}` 디렉토리만 mkdir. 마스터의 `core/`, `wrappers/` 코드 복사 *폐기* (2026-05-20 정합화 — 마스터가 진실 원천, 프로젝트엔 산출물 (md/html/json/ndjson) 만 존재).
+3. **프로젝트 산출물 폴더 보장** — 메인 repo 경로의 `.harness/{progress,reviews,results,research,tests,export}` 디렉토리만 mkdir. 마스터의 `core/`, `wrappers/` 코드 복사 *폐기* (2026-05-20 정합화 — 마스터가 진실 원천, 프로젝트엔 산출물 (md/html/json/ndjson) 만 존재). 생성 전 `~/.codex/skills/harness/docs/artifacts.json` 을 읽고 경로·확장자 manifest 와 충돌하는 산출물 경로를 만들지 않는다.
 4. **harness-* helper 가용성 확인 + sub-agent 강제 게이트** — 본 워크플로우가 사용할 harness-* helper 또는 Codex skill 가용성을 확인한다. QA/customer sub-agent 부재는 직접 수행으로 대체하지 않고 `BLOCKED / DEPENDENCY_MISSING` 으로 처리한다.
 
    | 호출 대상 | 위치 | 부재 시 처리 |
@@ -21,6 +21,7 @@
    - **검증 절차**: skill 경로는 `SKILL.md`, agent spec 경로는 `.md` 파일 존재 여부를 확인한다. Codex App에서는 custom agent type 존재를 요구하지 않는다. 대신 실제 호출 시 사용 가능한 spawn 도구가 있으면 `agent_type="worker"` 또는 `agent_type="default"`로 spawn하고 agent spec 전문을 prompt에 넣는다.
    - QA/customer agent spec 또는 spawn 도구 부재 시 `progress-<slug>.md` 에 `subagent_missing=<name>` 또는 `subagent_spawn_missing=true` 를 기록하고 해당 step 진입 시 BLOCKED 처리한다.
    - **자동 복구 안 함**: 본 step1 도 `bootstrap-runtime.sh` 도 `/harness-setup` 도 부재 skill/helper를 자동 생성하지 않는다. skill 생성은 사용자가 명시 요청 시에만 별도 작업으로 수행한다.
+   - **agent spec parity check**: `~/.codex/agents/<name>.md` 와 `~/.codex/skills/harness/agents/<name>.md` 가 둘 다 있으면 SHA-256 을 비교한다. 다르면 `progress-<slug>.md` 에 `agent_spec_drift=<name>` 을 기록하고, 실제 호출에는 root `~/.codex/agents/<name>.md` 를 우선 사용한다. 드리프트가 권한·도구·판정 규칙을 바꾸는 경우 해당 step 진입 전 `BLOCKED / DEPENDENCY_MISSING`.
 
 5. **learning 파일 확인 (QA/customer 페르소나)** — 다음 공용 learning 파일이 설치본에 있는지 확인한다. 없으면 helper를 호출하지 말고 해당 step 을 `BLOCKED / DEPENDENCY_MISSING` 으로 처리한다. 호출자 Codex 직접 수행 금지.
    - `agents/learning/harness-customer-user.md`

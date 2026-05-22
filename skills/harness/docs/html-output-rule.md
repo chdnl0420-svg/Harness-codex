@@ -7,7 +7,7 @@
 다음 모두가 산출물을 만들 때 본 규칙 적용:
 
 - `/harness` 메인 + `/harness-*` 모든 슬래시 커맨드 (harness-spec / harness-review / harness-customer-user / harness-distill / harness-ask / harness-audit / harness-setup / harness-help)
-- 페르소나 helper/sub-agent (`harness-qa-engineer` · `harness-customer-user`) 및 shared `$deepresearch` report
+- 페르소나 helper/sub-agent (`harness-qa-engineer` · `harness-customer-user`) 및 Harness 가 직접 작성하는 research summary. Shared `$deepresearch` 원본 report 는 해당 skill 의 native Markdown 규칙을 우선한다.
 - harness 가 호출하는 일반 skill/agent (`plan` · `tdd` · `code-review` · `security-review` · `build-fix` · `architect` · `code-reviewer` · `security-reviewer` · `tdd-guide` · 언어별 `*-build-resolver`) 가 harness 컨텍스트에서 산출물 작성 시 — 호출 prompt 에 본 규칙 명시 prepend.
 - harness 호출자 Codex (sub-agent 강제 모드)
 - `.harness/` 디렉터리에 떨어지는 모든 산출물 — domain / implementation / progress / review / research / qa / customer / test-guide / report / state / events / export 등 (분류별 HTML, MD, JSON, NDJSON)
@@ -72,7 +72,7 @@
 
 호출자 Codex (또는 harness 메인 스킬) 이 `harness-*` helper/sub-agent나 다른 스킬 호출 시 프롬프트에 다음을 **명시 포함**:
 
-> "산출물은 반드시 `~/.codex/AGENTS.md` Section 6 + 6.3.1, `~/.codex/skills/harness/docs/html-output-rule.md` 규칙을 따른다 — 단일 HTML 파일 + 탭 인터랙티브 (첫 탭은 항상 요약) + 1뷰포트 무스크롤 + **저장 직후 채팅에 절대경로 한 줄 보고** (자동 브라우저 열기 금지, file:// 링크 사용 금지)."
+> "산출물은 반드시 `~/.codex/AGENTS.md` Section 6 + 6.3.1, `~/.codex/skills/harness/docs/html-output-rule.md` 규칙을 따른다. HTML 산출물은 단일 HTML 파일 + 탭 인터랙티브 (첫 탭은 항상 요약) + 1뷰포트 무스크롤을 적용하고, MD/JSON/NDJSON 산출물은 manifest 확장자를 따른다. 저장 직후 채팅에는 절대경로 한 줄만 보고한다 (자동 브라우저 열기 금지, file:// 링크 사용 금지)."
 
 ## 보고서 카테고리별 첫 탭 권장 라벨
 
@@ -82,6 +82,6 @@
 | 플랜·PRD·spec | "Overview" | 목표·범위·핵심 결정 1줄씩 |
 | 코드/문서 리뷰 (`harness-review`) | "Summary" | 총평·CRITICAL/HIGH 카운트·권고 액션 |
 | QA 결과 (`harness-qa-engineer`) | "Summary" | Pass/Fail·블록·재현률 |
-| Customer test (`harness-customer-user`) | "Summary" | SUS·SEQ·Time-to-First-Value·첫 인상 |
+| Synthetic customer walkthrough (`harness-customer-user`) | "Summary" | SUS·SEQ·Time-to-First-Value·첫 인상·합성 증거 한계 |
 | Deep research (`$deepresearch`) | "TL;DR" | 1-3문장 결론 + 핵심 근거 카드 |
 | Stop / Commit report | "Summary" | 한 일·다음 액션·미해결 항목 |

@@ -19,7 +19,7 @@ Codex App bridge:
 2. Do not pass `agent_type="harness-customer-user"` unless the runtime explicitly lists that exact value as valid.
 3. Read `~/.codex/agents/harness-customer-user.md` first; if missing, read `~/.codex/skills/harness/agents/harness-customer-user.md`.
 4. Include the full agent spec in the spawned prompt after: `You are acting as harness-customer-user according to the Harness agent spec below.`
-5. Include Prior Learning, production launch details, main repo `.harness/` path, the output path, and only the minimum customer brief needed to know what product is being opened. Do not pass click order, expected path, scoring method, or test procedure as user-facing instructions.
+5. Include Prior Learning, production launch details, main repo `.harness/` path, the output path, and only user-facing product information: what the program is, what features it has, and the basic way an ordinary user would use it. Do not pass click order, expected path, scoring method, or test procedure as user-facing instructions.
 6. If the spawned worker returns the report body instead of writing the file, save that body verbatim. Do not author or alter the customer persona verdict in the caller session.
 
 ## Required Flow
@@ -38,7 +38,7 @@ Codex App bridge:
 3. Caller Codex invokes the `harness-customer-user` subagent/helper.
    - Do not use `isolation: "worktree"`.
    - The prompt must include `## Prior Learning (READ FIRST - DO NOT SKIP)` in the first 200 lines.
-   - The prompt must state that Harness provides product execution information only; the worker owns the test method and must use a first-time ordinary-user, skeptical, friction-seeking stance.
+   - The prompt must state that Harness provides only user-facing product information (`what it is / features / basic use`) plus launch details; the worker owns the test method and must use a first-time ordinary-user, skeptical, friction-seeking stance.
    - The subagent writes `.harness/results/customer-<slug>.md`.
 
 4. Caller Codex reads `.harness/results/customer-<slug>.md`, records the result path in progress, cleans up the production install if needed, and continues to step8.

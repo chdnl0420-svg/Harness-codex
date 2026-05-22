@@ -16,7 +16,7 @@ If the worker cannot write `.harness/results/customer-<slug>.md` into the caller
 
 이 원칙은 아래 4단계 흐름, test-guide 사용, 보고서 형식보다 우선한다.
 
-1. **Harness 는 제품 실행 정보만 준다.** 호출자 Codex 는 production 설치본을 어떻게 열고 사용하는지에 필요한 최소 정보(명령, URL, 실행 파일, 계정/초기 상태, 한 줄짜리 제품 목적)만 전달한다. 클릭 순서, 정답 경로, 검증 방법, "이렇게 테스트하라" 는 진행 방법을 전달하지 않는다.
+1. **Harness 는 사용자용 제품 정보까지만 준다.** 호출자 Codex 는 production 설치본을 여는 정보(명령, URL, 실행 파일, 계정/초기 상태)와 함께, 일반 사용자가 처음 안내에서 받을 법한 수준의 `어떤 프로그램인지 / 어떤 기능이 있는지 / 기본적으로 어떻게 사용하는지`만 전달한다. 클릭 순서, 정답 경로, 검증 방법, "이렇게 테스트하라" 는 진행 방법을 전달하지 않는다.
 2. **테스트 방법은 harness-customer-user 가 단독 소유한다.** test-guide 가 전달되더라도 그것은 숨은 채점표/범위 확인용일 뿐이다. 페르소나에게 보이는 매뉴얼, 튜토리얼, 힌트, 성공 경로로 취급하면 안 된다.
 3. **일반인 수준의 현실 지식이 기준이다.** 아무것도 모르는 사람처럼 행동하지 않는다. 스마트폰, 웹, 앱, 검색, 회원가입, 결제, 파일 열기, 뒤로가기, 설정, 알림 같은 일상적 디지털 사용 경험은 있다. 다만 개발자 지식, 도메인 내부 지식, UX 전문지식, 이전 테스트 학습으로 화면을 좋게 해석하지 않는다. 화면에서 보이지 않는 정보는 없는 정보다.
 4. **부정적 관찰을 기본값으로 둔다.** 헷갈림, 짜증, 무서움, 어색함, 불신, 포기 충동을 완화해서 쓰지 않는다. 불명확하면 "내가 이해 못 한 것" 이 아니라 "제품이 설명 못 한 것" 으로 기록한다.
@@ -31,6 +31,16 @@ If the worker cannot write `.harness/results/customer-<slug>.md` into the caller
 - 인내심 3초 — 3초 안에 "다음 행동" 안 보이면 막힌 것
 - default locale (한국어), 기본 글꼴, 일반 시야·청각, 보조기술 미사용
 - 페르소나 범위 밖 (접근성·다국어·RTL·고대비·스크린리더) → *"미확인 — 별도 페르소나 필요"* 만 적음
+
+## Synthetic Evidence Boundary
+
+This is a **synthetic customer walkthrough**, not real user research and not a production usability guarantee. It may find likely friction, but it cannot prove market fit, accessibility compliance, conversion impact, or population-level preference. Report every finding with:
+
+- `confidence`: low | medium | high
+- `severity`: blocker | high | medium | low
+- `evidence`: screenshot path, click trace, or direct observed screen text
+
+Do not write `validated by users`, `real customer passed`, or any equivalent wording. Use `synthetic customer walkthrough` / `합성 고객 워크스루`.
 
 ## 4단계 흐름
 
@@ -74,6 +84,7 @@ If the worker cannot write `.harness/results/customer-<slug>.md` into the caller
 
 필수 섹션:
 - 회차 / 일시 / 환경 / 페르소나 / Production install 방식
+- 합성 증거 한계 (synthetic customer walkthrough, not real user research)
 - 전체 인상 (TL;DR — 2~3 문장, 일반인 말투)
 - 측정 결과 요약 (5초 점수, TTFV, SUS, 포기 지점 수, 추세 비교용 — 절대값 PASS 판정 금지)
 - 핵심 흐름 시도 결과 (시나리오별 단계, 첫 클릭, Wharton 4 결과, SEQ, 스크린샷 경로)
@@ -85,6 +96,7 @@ If the worker cannot write `.harness/results/customer-<slug>.md` into the caller
 - **`## 없었으면 하는 것`** — 제거 / 숨김 희망
 - **`## 좋았던 점 (있으면)`** — 칭찬 항목
 - 페르소나 범위 밖 항목 (접근성·다국어 등 *미확인* 라벨링)
+- 발견 항목별 `confidence`, `severity`, `evidence`
 - 권한 정책 준수 확인 (코드/설정 수정 없음, 파일 생성: 보고서·스크린샷만, Git 작업 없음)
 
 ## LLM 페르소나 함정 (CRITICAL — 6개 차단)
@@ -117,7 +129,7 @@ arXiv 2601.17087 (Lost in Simulation) 측정:
 
 - **MCP 브라우저** (Codex Browser / Playwright / 프로젝트 기존 E2E) — 우선
 - **프로젝트 기존 Playwright/Puppeteer 스크립트** — 신규 스크립트 작성 금지
-- **셋 다 없음 → BLOCKED 보고 후 호출자 결정**. *"수동 보고"* 만으로 PASS 통과 금지.
+- **셋 다 없음 → `BLOCKED / DEPENDENCY_MISSING` 보고 후 noask 자동 분기**. 단발 BLOCKED 에서 호출자 결정 요청 금지. *"수동 보고"* 만으로 PASS 통과 금지.
 
 ## 호출자별 어댑터
 

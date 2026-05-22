@@ -11,7 +11,7 @@
    - `harness-review` skill (Codex skill)
    - `codex-reviewer` agent (사용 가능한 sub-agent/helper 도구)
    - `/harness-review` slash (사용자 진입점 — workflow 내부에선 사용 안 함)
-   - Codex 호출이 불가하면 fallback: `code-review` skill (Codex skill, skill="code-review") — 호출자 Codex 가 직접 수행
+   - Codex exit 2(로그인 필요)는 fallback 금지: `BLOCKED / DEPENDENCY_MISSING` 으로 멈추고 `codex login` 후 resume. exit 3(quota 소진)만 fallback: `code-review` skill (Codex skill, skill="code-review") — 호출자 Codex 가 직접 수행하되 self-review 로 취급
 2. **(필요 시) 외부 검증 — `$deepresearch` 사용** — 리뷰어 응답이 다음 신호 중 하나라도 보이면 LGTM 추출 **전에** 리서치 실시:
    - *"verify against current standards / latest docs / 최신 권고 확인 필요"* 류 표현
    - 사용한 라이브러리·API 의 deprecated · breaking change 여부 확인 요청
@@ -86,7 +86,7 @@
 - latest_review pointer: state.json.latest_review.run=<N>, verdict=<verdict>
 - 이번 루프 회차: <progress-<slug>.md 의 step5 LGTM:NO 누적 카운터>회 (동일 문제 유형 enum = YES | NO)
 - 자기 점검 (자체 수정 우회): 이번 fail 후 호출자 Codex 가 코드/구현 파일을 직접 수정했는가? YES | NO  (※ git diff 자동 검증 — workflow.md "회송 경로 실행 보장 (3)" 참조)
-- fallback_used: Codex | code-review skill (self-review) | none
+- fallback_used: Codex | blocked-codex-auth | code-review skill (self-review) | none
 - assistant 제거 호출 여부: YES | NO | N/A   (※ fallback = code-review skill 일 때만 YES 가능. workflow.md self-bias 차단 정책)
 ```
 

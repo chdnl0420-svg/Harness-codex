@@ -46,7 +46,7 @@ current_chunk_blocked_reason: null
 - [ ] Step 4: 구현
 - [ ] Step 5: 리뷰
 - [ ] Step 6: QA
-- [ ] Step 7: 고객 사용자 검증
+- [ ] Step 7: 합성 고객 워크스루
 - [ ] Step 8: 완료 전 정리
 - [ ] Complete: 최종 보고
 
@@ -65,7 +65,7 @@ current_chunk_blocked_reason: null
 - Review: `.harness/reviews/review-<slug>.md`
 - QA: `.harness/results/qa-<slug>.md`
 - Customer: `.harness/results/customer-<slug>.md`
-- Final report: `.harness/results/report-<slug>.html`
+- Final report: `.harness/report-<slug>.html`
 
 ## Recent Actions
 

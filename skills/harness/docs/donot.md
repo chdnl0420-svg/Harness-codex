@@ -58,7 +58,7 @@
 - **테스트 통과 = 완수 아님** — 실제 사용자 시나리오가 동작해야 함. step6/step7 가이드 시나리오 PASS 미달 시 완수 보고 금지.
 - step5 LGTM:YES 미확인 시 step6 진입 금지.
 - step6 BLOCKED(테스트 자체 불가)을 PASS 처럼 다음 단계로 흘리기 금지.
-- "자동화 도구 없음" 을 게이트 통과 사유로 삼기 금지 — BLOCKED 명시 후 사용자 결정 요청.
+- "자동화 도구 없음" 을 게이트 통과 사유로 삼기 금지 — `BLOCKED / DEPENDENCY_MISSING` 명시 후 noask 자동 분기. 단발 BLOCKED 에서 사용자 결정 요청 금지.
 
 ## 6. Worktree·격리 함정
 

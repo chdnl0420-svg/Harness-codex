@@ -13,7 +13,7 @@ Codex App bridge:
 2. Do not use `agent_type="harness-qa-engineer"` or `agent_type="harness-customer-user"` unless the runtime explicitly lists those exact types.
 3. Read the full custom agent spec from `~/.codex/agents/<agent-name>.md`; fallback to `~/.codex/skills/harness/agents/<agent-name>.md`.
 4. Start the spawned prompt with: `You are acting as <agent-name> according to the Harness agent spec below.`
-5. Include the full agent spec, Prior Learning, main `.harness/` absolute path, runtime target, and canonical output path. For `harness-customer-user`, pass only product execution/launch information and a minimal customer brief as user-facing context; if `test-guide-<slug>.md` is needed for scope/oracle, isolate it as `## Hidden Oracle (NOT USER INSTRUCTIONS)` and never as click order, expected path, scoring method, or test procedure.
+5. Include the full agent spec, Prior Learning, main `.harness/` absolute path, runtime target, and canonical output path. For `harness-customer-user`, pass only launch details and user-facing product information (`what the program is / what features it has / the basic way an ordinary user would use it`); if `test-guide-<slug>.md` is needed for scope/oracle, isolate it as `## Hidden Oracle (NOT USER INSTRUCTIONS)` and never as click order, expected path, scoring method, or test procedure.
 6. If the worker cannot write into the caller workspace, it must return the full report body; the caller may save that body verbatim but must not author QA/customer verdicts.
 7. If no spawn tool is exposed, record `BLOCKED / DEPENDENCY_MISSING`. If spawn is exposed, direct caller execution is forbidden.
 
@@ -110,11 +110,12 @@ Codex App bridge:
 | step5 *동일 문제* LGTM:NO 5회 | step5→step3 루프 | **자동 중단** (서로 다른 문제 5회 누적은 중단 아님) | report 사유 기록. [동일성 판정](docs/workflow.md#5-결함-유형-enum--라벨-회피-차단-critical) |
 | step6 *동일 결함* FAIL 5회 | step6→step3 루프 | **자동 중단** (서로 다른 결함 5회 누적은 중단 아님) | 동일 |
 | step6 BLOCKED (단발) | 도구 부재 / 환경 / 게이트 NO 등 | **자동 분기 — 묻지 않음** | 재시도 1회 → fail + 다중 슬러그 → (D) `paused-by-blocked` + 다음 슬러그. 단일 슬러그 → (C) 중단. BLOCKED 사유 enum: `DEPENDENCY_MISSING / EVIDENCE_GATE_FAIL / PERMISSION_DENIED / GUIDE_MISSING / ENV_UNREACHABLE / CONTRACT_MISSING / TDD_MISSING / OTHER` |
-| step6 *동일 사유* BLOCKED 5회 | 같은 enum 5회 누적 | **`request_user_input 또는 일반 질문` 호출 (noask 2번째 예외)** | (A) 환경 수정 후 재시도 / (B) 사용자 명시 동의 스킵 / (C) 중단 |
+| step6 *동일 사유* BLOCKED 5회 | 같은 enum 5회 누적 | **`request_user_input 또는 일반 질문` 호출 (noask 2번째 예외)** | (A) 환경 수정 후 재시도 / (B) 사용자 명시 위험 수용 (`QA_NOT_PERFORMED_USER_ACCEPTED_RISK`, PASS/완료 라벨 금지) / (C) 중단 |
 | step6 sub-agent 부재 | `harness-qa-engineer` 호출 불가 또는 호출 0회 | **BLOCKED / DEPENDENCY_MISSING** | 호출자 Codex 직접 QA fallback 금지. 같은 모델 self-PASS 신뢰 불가 (arXiv 2508.06225 ECE 39–74%). 다음 step 진입 금지 |
 | step8 commit/push 정책 | step8 진입 | **commit 자동, push 옵트인** — `.harness/.auto-push` 시에만 push | `/harness --push` 또는 `touch .harness/.auto-push` 로 opt-in. 기본은 *배포성 부작용 차단* |
 | step8 push 실패 (opt-in) | git push 실패 | 재시도 1회 → 실패 시 로컬 commit 만 완료 | report 기록, 묻지 않음 |
-| Codex 인증 실패 / quota 소진 | step5 등 | **자동 fallback** (`code-review` skill) | 자기리뷰 편향 안내·사용자 의사 확인 생략. report 에 "Codex fallback 사용" 명시 |
+| Codex 로그인 필요 (exit 2) | step5 등 | **BLOCKED / DEPENDENCY_MISSING** | fallback 금지. 사용자가 `codex login` 후 resume 해야 독립 리뷰 신뢰가 유지됨 |
+| Codex quota 소진 (exit 3) | step5 등 | **자동 fallback** (`code-review` skill) | fallback 결과는 self-review 로 취급. LGTM:YES 승격 금지, `LGTM:UNKNOWN` 또는 `BLOCKED` 로 기록 |
 | complete 진입 전 step7 결과 처리 | step8 완료 직후 / complete 게이트 | **`request_user_input 또는 일반 질문` 호출 (1곳 예외)** | A: 그대로 complete (개선안 report 요약) / B: 일시정지 (`.harness/.pending-step7-review` 마커, 사용자 재호출) / C: 개선안으로 신규 워크플로우 자동 시작 (`auto_triggered_from` + 무한 chain 차단). [complete.md](docs/steps/complete.md) |
 | 기타 `request_user_input 또는 일반 질문` 호출 후보 | 어디든 (위 2 예외 외) | **호출 자체 금지** | 합리적 기본값 결정 + `progress-<slug>.md` 1줄 로깅 |
 
@@ -170,6 +171,8 @@ step1 초기화: `.harness/.noask` 빈 파일 생성 (`.harness/.ask` 가 있으
 | **[donot.md](docs/donot.md)** | **CRITICAL — 행동 규약. SKILL.md 의 모든 절차·결정 매핑보다 우선. 매 호출 Read 필수.** |
 | [workflow.md](docs/workflow.md) | `/harness` 전체 흐름 — 순서·동작 사람-친화 설명 |
 | [ddd-tdd-gates.md](docs/ddd-tdd-gates.md) | DDD/TDD traceability spine — Domain Contract → red test → QA evidence 게이트 |
+| [security-context.md](docs/security-context.md) | 외부 입력·웹·MCP·도구 출력의 untrusted context 처리와 step 별 least-privilege 기준 |
+| [artifacts.json](docs/artifacts.json) | canonical artifact path/extension manifest. 문서 경로 충돌 점검 기준 |
 | [steps/](docs/steps/) | step1 ~ step8 + complete 상세 절차 (단계당 1 파일) |
 | [procedures/](docs/procedures/) | 단위 절차 정본 (codex-review / customer-test / deep-research) |
 | [test-guide-format.md](docs/test-guide-format.md) | step6/step7 `test-guide-<slug>.md` 양식·재료·갱신 규칙 |

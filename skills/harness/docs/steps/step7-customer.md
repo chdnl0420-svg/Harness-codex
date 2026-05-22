@@ -9,11 +9,13 @@ Codex App bridge:
 1. Read the custom agent spec from `~/.codex/agents/harness-customer-user.md`; if absent, read `~/.codex/skills/harness/agents/harness-customer-user.md`.
 2. Spawn the available sub-agent tool with `agent_type="worker"` (`default` only if `worker` is unavailable). Do not use `agent_type="harness-customer-user"` unless the runtime explicitly lists it as valid.
 3. The spawned prompt must start with: `You are acting as harness-customer-user according to the Harness agent spec below.`
-4. Include the full agent spec, Prior Learning, main repo `.harness/` absolute path, production install/launch details, output path `.harness/results/customer-<slug>.md`, and only the minimum customer brief needed to understand what product is being opened. Do not pass click order, expected path, scoring method, or test procedure as user-facing instructions.
+4. Include the full agent spec, Prior Learning, main repo `.harness/` absolute path, production install/launch details, output path `.harness/results/customer-<slug>.md`, and only user-facing product information: what the program is, what features it has, and the basic way an ordinary user would use it. Do not pass click order, expected path, scoring method, or test procedure as user-facing instructions.
 5. If the worker cannot write into the caller workspace, it must return the full report body. The caller may save that body verbatim but must not role-play the customer persona or decide the customer verdict itself.
 6. If no sub-agent spawn tool is exposed, record `BLOCKED / DEPENDENCY_MISSING` and stop before Step8.
 
 **산출물**: `.harness/results/customer-<slug>.md`
+
+**증거 한계**: step7 은 **합성 고객 워크스루(synthetic customer walkthrough)** 이다. 실제 사용자 조사, 접근성 적합성, 시장 검증, 전환율 검증으로 표현하지 않는다. 모든 발견은 `severity`, `confidence`, `evidence` 를 함께 기록해야 하며, "실제 사용자 검증 완료" 류의 문구는 금지한다.
 
 **입력 게이트 (skip 금지 — 호출자 Codex 가 진입 직전 자체 검증)**:
 
@@ -52,7 +54,7 @@ step5/step6 의 입력 게이트와 동등 강도. 누락 시 step 스킵 위반
    - test-guide 내용을 전달해야 할 때는 `## Hidden Oracle (NOT USER INSTRUCTIONS)` 로 격리하고, 도우미가 숨은 채점표로만 취급하게 한다.
    - 누락 시 도우미가 `[BLOCKED]` 로 거부.
    - 도우미는 메인이 설치/실행해 둔 **실제 설치본**에 접속해서 테스트한다.
-4. 도우미가 "제품을 처음 본 일반인" 페르소나로 제품을 독립 탐색한다. Harness 는 제품 실행 방법 이후의 테스트 진행 방법을 알려주지 않는다.
+4. 도우미가 "제품을 처음 본 일반인" 페르소나로 제품을 독립 탐색한다. Harness 는 `어떤 프로그램인지 / 어떤 기능이 있는지 / 기본적으로 어떻게 사용하는지` 정도만 알려주며, 그 이후의 테스트 진행 방법은 알려주지 않는다.
 5. 보고서 작성 (불편사항, 이상한 점, 바꿨으면 하는 것, 있었으면 하는 것, 없었으면 하는 것, 첫인상, 막힌 지점, 헷갈린 단어 등)
 6. **게이트 아님** — 결과 통과/실패와 무관하게 다음 단계 (step8) 로
    - 발견된 사용성 이슈는 complete 단계의 `report-<slug>.html` 에 요약 포함

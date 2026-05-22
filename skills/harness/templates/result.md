@@ -71,8 +71,8 @@ critique_method: <codex | code-review-skill | self-only>
 | Research | `research/research-<id>-*.md` |
 | Reviews | `reviews/review-<id>.md` |
 | QA | `results/qa-<id>.md` |
-| Customer | `results/customer-<id>.md` |
-| **Final report** | **`results/report-<id>.html`** |
+| Synthetic customer walkthrough | `results/customer-<id>.md` |
+| **Final report** | **`report-<id>.html`** |
 | Canonical state | `state.json` |
 | Event log | `events.ndjson` |
 | Handoff export | `export/<id>-handoff.md` 또는 `docs/progress/<id>-summary.md` |

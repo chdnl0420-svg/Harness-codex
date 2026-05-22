@@ -18,7 +18,7 @@
 회송 진입 모드면 일반 절차 전에 다음을 **반드시 수행**한다. 누락하면 step4 가 직전 회차와 동일한 plan 으로 재실행 → 무한 루프 또는 자체 수정 우회.
 
 1. **직전 결함 본문 Read** — 회송 트리거에 따라:
-   - LGTM:NO 회송: `.harness/review-<slug>.md` 의 마지막 `## Run #<N>` 섹션 전문
+   - LGTM:NO 회송: `.harness/reviews/review-<slug>.md` 의 마지막 `## Run #<N>` 섹션 전문
    - FAIL 회송: `.harness/results/qa-<slug>.md` 의 마지막 FAIL 회차 섹션 전문
 2. **plan skill 호출 prompt 에 prepend** — 일반 절차의 prompt 앞에 다음 양식으로 직전 결함 prepend (workflow.md "회송 시 결함 전달 양식" 참조):
 
@@ -38,7 +38,7 @@
 **금지**: 직전 회차와 동일한 plan 본문을 재생성하지 말 것. 위 결함 항목이 plan 의 "변경 대상 파일 목록" / "단계별 구현 순서" 에 실제 차이로 반영되어야 step4 진입 가능.
 ```
 
-3. **implementation-<slug>.md 수정 이력 섹션 강제** — 회송 모드에서는 새 plan 작성 후 `implementation-<slug>.md` 끝에 다음 섹션을 누적 append:
+3. **implementation-<slug>.html 수정 이력 섹션 강제** — 회송 모드에서는 새 plan 작성 후 `implementation-<slug>.html` 끝에 다음 섹션을 누적 append:
 
 ```markdown
 ## 수정 이력
@@ -55,7 +55,7 @@
    - 도메인 설계의 *영향 영역* 에 해당하는 기존 파일 식별 (Glob/Grep)
    - 변경될 인터페이스·데이터 구조·의존성 목록화
    - 이미 존재하는 비슷한 패턴(naming, layout, error handling) 확인
-   - 결과는 `.harness/implementation-<slug>.md` 작성 시 *"기존 코드 영향 영역"* 섹션으로 반영
+   - 결과는 `.harness/implementation-<slug>.html` 작성 시 *"기존 코드 영향 영역"* 섹션으로 반영
    - 탐색 없이 plan 만 만들면 step4 에서 추측 코딩 → 리뷰 fail → step3 무한 루프
 2. **(필요 시) 외부 리서치 — `$deepresearch` 사용** — 다음 중 하나라도 해당하면 plan skill 호출 전에 리서치 실시:
    - 도입할 라이브러리·API 사용법이 학습 데이터 cutoff 이후 변경된 영역
@@ -79,10 +79,11 @@
    - **단일 모드**: `implementation-<slug>.html` 작성 → step4 로 (1 회만)
    - **Chunks 모드**: 아래 "Chunks 분해 절차" 의 4단계 수행 → 첫 chunk 의 step4 로 진입 → chunk loop 시작
 
-**필수 산출 섹션** (`implementation-<slug>.md` 에 반드시 들어가야 함):
+**필수 산출 섹션** (`implementation-<slug>.html` 에 반드시 들어가야 함):
 - **변경 대상 파일 목록** — 수정/신규 구분, 절대 경로
 - **기존 코드 영향 영역** — 1번 탐색 결과
 - **Contract/Test Trace** — Step2 `Domain Contract` 의 contract_id 별로 허용 파일, 구현 단계, `evidence_mode`(`STRICT_RED`/`CHARACTERIZATION`/`STATIC_ONLY`), 실행 명령, expected red/current, expected green, QA evidence 를 연결. 보통 chunk 는 compact table 로 충분하며, 고위험 chunk 는 [`../ddd-tdd-gates.md`](../ddd-tdd-gates.md) 의 full matrices 를 따른다.
+- **Artifact Manifest Trace** — `../artifacts.json` 기준으로 이번 plan 이 쓰거나 갱신할 산출물 키와 실제 경로를 나열한다. manifest 에 없는 경로·확장자는 사용 금지.
 - **Test Design Matrix** — full matrices 가 필요한 경우 각 contract_id 별 evidence_mode, test size(small/medium/large), test type, 실행 명령, expected red/current, expected green 을 기록. `STRICT_RED` 가 기본이며 `CHARACTERIZATION`/`STATIC_ONLY` 는 plan 안에 이유를 명시해야 한다.
 - **단계별 구현 순서** — 각 단계의 *입력 / 작업 / 검증 방법* 3축
 - **테스트 전략** — 어떤 레벨(unit/integration/e2e) 로 무엇을 검증
@@ -121,7 +122,7 @@ Report 경로는 progress 에 기록하고 plan prompt 의 *"참고 자료"* 로
 
 위 4개 신호 중 **2개 이상이 임계값 통과** 하면 Chunks 모드. 그 외는 단일 모드 (기존 동작).
 
-판정 결과를 `progress-<slug>.html` 의 *진행 상태* 카드에 1줄 기록:
+판정 결과를 `.harness/progress/progress-<slug>.md` 의 *진행 상태* 섹션에 1줄 기록:
 ```
 mode: single | chunks (chunks=N, 분해 사유: <어떤 신호 어떤 값>)
 ```
@@ -203,7 +204,7 @@ chunk 사이 전환은 **noask 정신상 자동** (사용자 결정 불필요). 
 ├── implementation-<slug>.html                    (단일 모드 — chunks 모드와 상호 배타)
 ├── reviews/review-<slug>-chunk-<N>.md            (chunks 모드 — chunk 별 리뷰)
 ├── results/qa-<slug>-chunk-<N>.md                (chunks 모드 — chunk 별 QA)
-└── progress/progress-<slug>.html                 (전체 + chunks 진행 상태)
+└── progress/progress-<slug>.md                   (전체 + chunks 진행 상태)
 ```
 
 단일 모드는 *chunk 접미사 없음* — 기존 그대로.

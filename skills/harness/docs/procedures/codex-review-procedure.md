@@ -39,7 +39,7 @@ codex exec --sandbox workspace-write \
 1. **exit code 확인**:
    - `0` → result 파일 존재 + 비어 있지 않은지 확인
    - `2` → **Codex 로그인 필요**. 사용자에게 안내: *"새 터미널 (cmd / PowerShell / Git Bash) 열고 `codex login` 실행 후 재시도"*. fallback 금지.
-   - `3` → **Codex quota 소진**. Codex self-review 또는 사용 가능한 독립 리뷰 helper 또는 `code-review` skill 로 fallback. report 에 *"fallback_used: code-review skill (self-review)"* 기록.
+   - `3` → **Codex quota 소진**. `code-review` skill 로 fallback 가능. report 에 *"fallback_used: code-review skill (self-review)"* 기록하고 `LGTM:YES` 로 승격하지 않는다.
    - 기타 → 에러 보고
 2. **result 파일 Read** (`Read` 도구):
    - `<project>/.harness/reviews/codex-review-<slug>-result.md` 본문 확인

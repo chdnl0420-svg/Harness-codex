@@ -30,10 +30,22 @@
 
 ## Domain Contract Coverage
 Step2 `Domain Contract` 와 Step3 `Contract Traceability Matrix` 에서 온 계약을 그대로 적는다.
+Step6 UI-affecting changes must also fill `Accessibility Evidence` below.
 
 | contract_id | domain term/rule | covered scenario | evidence type | required |
 |---|---|---|---|---|
 | C1 | <업무 규칙> | F1 | <evidence> | YES |
+
+## Accessibility Evidence
+UI-affecting changes only. If the change does not affect UI, write `N/A - no UI surface changed`.
+
+| area | check | evidence type | required |
+|---|---|---|---|
+| keyboard | tab order, activation, escape/back path | click_trace + screenshot | YES |
+| focus | visible focus state and no focus trap | screenshot + computed_style_assertion | YES |
+| contrast | text/control contrast method or tool output | computed_style_assertion | YES |
+| semantics | label, role, name, error relation | dom_assertion | YES |
+| motion | reduced-motion behavior or no motion introduced | static_assertion | YES |
 
 ## 기능별 정상 흐름
 ### F1: <이름>

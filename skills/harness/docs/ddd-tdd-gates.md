@@ -6,6 +6,12 @@ Harness uses DDD and TDD as a traceability spine, not as extra ceremony:
 
 Use this document when Step 2, Step 3, Step 4, Step 6, or the test guide needs a DDD/TDD decision. Do not add tactical DDD patterns just to look domain-driven. Add only the boundary, contract, and test evidence needed for the requested change.
 
+## Artifact Manifest Gate
+
+`skills/harness/docs/artifacts.json` is the canonical path and extension manifest. Step 1 must load it before creating `.harness/` files, and Step 3/5/6/7/8 must validate their output path against it before writing. If prose docs disagree with the manifest, the manifest wins and the prose path is treated as stale.
+
+Each `contract_id` in Step 2/3 must be traceable to at least one artifact entry in the manifest: implementation plan, review report, QA report, customer report, or final report. Missing traceability is `BLOCKED / CONTRACT_MISSING`; writing a non-manifest path is `BLOCKED / EVIDENCE_GATE_FAIL`.
+
 ## Decision Rule
 
 Use a risk-based evidence mode per `contract_id`.

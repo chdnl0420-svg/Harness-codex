@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "description": "Canonical Harness artifact path and extension manifest. If prose docs disagree, this manifest wins.",
+  "artifacts": {
+    "domain": {
+      "path": ".harness/domain-<slug>.html",
+      "format": "html",
+      "owner_step": "step2"
+    },
+    "implementation_single": {
+      "path": ".harness/implementation-<slug>.html",
+      "format": "html",
+      "owner_step": "step3"
+    },
+    "implementation_chunks_overview": {
+      "path": ".harness/implementation-<slug>-chunks-overview.html",
+      "format": "html",
+      "owner_step": "step3"
+    },
+    "implementation_chunk": {
+      "path": ".harness/implementation-<slug>-chunk-<n>.html",
+      "format": "html",
+      "owner_step": "step3"
+    },
+    "progress": {
+      "path": ".harness/progress/progress-<slug>.md",
+      "format": "markdown",
+      "owner_step": "step1"
+    },
+    "review": {
+      "path": ".harness/reviews/review-<slug>.md",
+      "format": "markdown",
+      "owner_step": "step5"
+    },
+    "codex_review_result": {
+      "path": ".harness/reviews/codex-review-<slug>-result.md",
+      "format": "markdown",
+      "owner_step": "step5"
+    },
+    "qa": {
+      "path": ".harness/results/qa-<slug>.md",
+      "format": "markdown",
+      "owner_step": "step6"
+    },
+    "customer": {
+      "path": ".harness/results/customer-<slug>.md",
+      "format": "markdown",
+      "owner_step": "step7"
+    },
+    "test_guide": {
+      "path": ".harness/test-guide-<slug>.md",
+      "format": "markdown",
+      "owner_step": "step6"
+    },
+    "state": {
+      "path": ".harness/state.json",
+      "format": "json",
+      "owner_step": "all"
+    },
+    "events": {
+      "path": ".harness/events.ndjson",
+      "format": "ndjson",
+      "owner_step": "all"
+    },
+    "report": {
+      "path": ".harness/report-<slug>.html",
+      "format": "html",
+      "owner_step": "complete"
+    },
+    "handoff": {
+      "path": ".harness/export/<slug>-handoff.md",
+      "format": "markdown",
+      "owner_step": "step8"
+    }
+  }
+}

@@ -30,7 +30,7 @@ Codex App bridge:
    - MCP 브라우저 (Codex Browser) — 가용 / 없음
    - Playwright 또는 프로젝트 기존 E2E (Playwright 또는 프로젝트 기존 E2E) — 가용 / 없음
    - 프로젝트 기존 Playwright / Puppeteer 스크립트 — 존재 / 없음
-   - **셋 다 NO 면 도우미 호출 전에 BLOCKED 즉시 보고**. step3 의 plan 이 자동화 테스트를 전제로 한 경우 의존성 부재가 plan 결함이므로 step3 회송 대상 아님 — 사용자 결정 분기로.
+   - **셋 다 NO 면 도우미 호출 전에 BLOCKED 즉시 보고**. step3 의 plan 이 자동화 테스트를 전제로 한 경우 의존성 부재가 plan 결함이므로 step3 회송 대상 아님 — noask 자동 분기로.
    - 점검 결과는 `qa-<slug>.md` 의 *의존성 점검* 섹션과 `progress-<slug>.md` 에 기록. 재진입 시 매번 재점검 (도구 가용성 변화 가능).
 2. **테스트 가이드 작성/갱신** (호출자 Codex 직접 작성) — 양식·재료·갱신 규칙은 [../test-guide-format.md](../test-guide-format.md) 참조
    - 최초 진입 시: 새로 작성
@@ -39,6 +39,7 @@ Codex App bridge:
    - 각 시나리오에는 기대 evidence type 을 명시한다. 허용 enum: `screenshot | click_trace | dom_assertion | network_trace | ipc_trace | persisted_state_trace | restore_trace | unit_test | static_assertion | computed_style_assertion`.
    - async send, IPC, persistence, localStorage/sessionStorage 변경 시나리오는 `static_assertion` 만으로 PASS 처리할 수 없다.
    - `Domain Contract Coverage` 와 `Contract-Violating Cases` 섹션이 있어야 한다. Step2/Step3 의 contract_id 중 빠진 항목이 있으면 QA 호출 전 `BLOCKED / GUIDE_MISSING`.
+   - UI, HTML, CSS, keyboard flow, form, navigation, modal, focus, color, or visible text changes require an `Accessibility Evidence` section. It must list at least keyboard path, focus visibility/order, text contrast method, semantic label/role check, and reduced-motion or motion absence. Missing accessibility evidence for UI-affecting changes is `BLOCKED / GUIDE_MISSING`.
 3. `harness-qa-engineer` 에 위임:
    - **sub-agent/helper 호출 필수.** 호출자 Codex가 같은 입력으로 직접 QA를 수행하거나 PASS/FAIL을 판정하는 fallback 금지.
    - 사용 가능한 sub-agent/helper 도구로 `harness-qa-engineer` 를 호출할 수 없으면 즉시 `BLOCKED / DEPENDENCY_MISSING` 으로 기록하고 step7 진입 금지.
@@ -51,7 +52,7 @@ Codex App bridge:
 4. 도우미가 가이드 기능 목록 순서대로 스크린샷 + 클릭 기반 시나리오 실행
    - MCP 브라우저 도구 (Codex Browser / Playwright / 프로젝트 기존 E2E) 우선
    - 없으면 프로젝트의 기존 Playwright/Puppeteer 스크립트만 호출 (신규 스크립트 작성 금지)
-   - **자동화 도구 전부 없으면 → BLOCKED 보고 후 사용자 결정 요청.** "수동 보고" 만으로 PASS 통과 금지.
+   - **자동화 도구 전부 없으면 → BLOCKED / DEPENDENCY_MISSING 기록 후 noask 자동 분기.** 단발 BLOCKED 에서 사용자 결정 요청 금지. "수동 보고" 만으로 PASS 통과 금지.
 4b. **persistent state 격리/복구 (CRITICAL)** — QA 가 앱의 지속 상태를 바꿀 가능성이 있으면 다음 우선순위를 적용한다.
    1. 별도 Electron `userData` 디렉터리 또는 독립 브라우저 profile 사용
    2. 불가능하면 localStorage/sessionStorage/cookie snapshot 저장 후 QA 종료 시 restore
@@ -64,6 +65,7 @@ Codex App bridge:
    - **재진입 시 직전 fail 시나리오 반영 검증**: 회송 후 첫 PASS 회차라면, 직전 fail 회차의 `결함 항목` 텍스트 (유형 enum + 파일 + 증상 키워드) 가 *이번 회차의 시나리오 본문에 grep 가능* 한지 확인. 안 잡히면 *직전 fail 을 우회한 가이드* 신호 → 자동 BLOCKED ("회송 반영 부족").
    - **evidence_matrix 검증**: 각 F1~Fn 은 `evidence_type`, `evidence_path`, `exists`, `verdict` 를 가진다. evidence type 이 시나리오 유형의 최소 기준을 만족하지 못하면 자동 BLOCKED 또는 `PASS_WITH_LIMITATIONS`.
    - **persistent state restore 검증**: QA 중 localStorage/sessionStorage/cookie/userData 를 바꿨다면 `persistent_state_restored: YES` 와 `restore_trace` 가 있어야 PASS 가능. 없으면 PASS 불가.
+   - **accessibility evidence 검증**: UI-affecting changes must have an accessibility evidence row in both `test-guide-<slug>.md` and `qa-<slug>.md`. Missing row, unsupported "not checked", or static-only evidence for keyboard/focus flow blocks PASS.
    - 게이트 결과는 `qa-<slug>.md` 의 *"산출물 게이트"* 섹션에 명시: `evidence_exists / coverage_full / regression_reproduced / persistent_state_restored` 4축 YES/NO.
 6. 분기:
    - **PASS** → step7 로 진행
@@ -78,7 +80,7 @@ Codex App bridge:
        - **단일 슬러그 모드** (큐 = 1): 자동 (C) 워크플로우 중단. report 에 BLOCKED 사유 전문 기록.
      - **동일 사유 5회 누적 → 사용자 결정 요청 (noask 정책의 두 번째 예외)**: 같은 *BLOCKED 사유 enum* 으로 5회 누적 시에만 `request_user_input 또는 일반 질문` 호출. complete 진입 게이트와 함께 noask 정책의 *유일한 2 예외* 중 하나. 선택지:
        - (A) 환경 수정 후 재시도 — supervisor 또는 운영자가 환경 점검 후 재호출
-       - (B) 사용자 명시 동의 스킵 — 다음 step 으로 진행 (test 약식 완료 처리)
+       - (B) 사용자 명시 위험 수용 — `QA_NOT_PERFORMED_USER_ACCEPTED_RISK` 로 기록. "완료" 또는 "PASS" 로 라벨링 금지
        - (C) 워크플로우 중단 — report 에 사유 기록
      - *서로 다른* BLOCKED 사유로 5회 누적은 사용자 결정 트리거 아님 — 각각 다른 환경 문제를 거치는 정상 진행.
 
@@ -101,7 +103,7 @@ Codex App bridge:
 - async send / IPC / persistence / localStorage 시나리오가 `static_assertion` 만으로 PASS 처리됨
 - persistent state 변경 후 restore trace 가 없음
 
-BLOCKED 는 사용자 결정 사항이다. 호출자 Codex 가 *"테스트 못 했지만 코드 봤을 때 괜찮을 듯"* 으로 PASS 처리 절대 금지.
+BLOCKED 는 PASS 대체가 아니다. 호출자 Codex 가 *"테스트 못 했지만 코드 봤을 때 괜찮을 듯"* 으로 PASS 처리 절대 금지. 사용자 결정 요청은 동일 BLOCKED 사유 5회 누적 시에만 허용한다.
 
 ## Evidence Matrix 규칙 (CRITICAL)
 

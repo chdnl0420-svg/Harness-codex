@@ -45,8 +45,8 @@ codex exec --sandbox workspace-write \
 
 1. exit code 확인:
    - `0` → result 파일 존재·비어있지 않음 확인 후 호출자에 절대경로 반환
-   - `2` → **Codex 로그인 필요** → Codex `code-reviewer` agent 또는 `code-review` skill 로 *자동 fallback*. report 에 `fallback_used: code-review (codex auth)` 기록. (사용자가 Codex 재사용 원하면 별도 터미널에서 `codex login` — 다음 호출부터 복구.) ※ 2026-05-20 정합화: 이전 "fallback 금지, 사용자 대기" 정책은 noask 흐름과 충돌해 폐기. SKILL.md "자동 결정 매핑" 표 (line 80) 와 일치.
-   - `3` → **Codex quota 소진** → 동일하게 Codex `code-reviewer` agent / `code-review` skill 로 자동 fallback. report 에 `fallback_used: code-review (codex quota)` 기록.
+   - `2` → **Codex 로그인 필요** → fallback 금지. `BLOCKED / DEPENDENCY_MISSING` 으로 기록하고 사용자가 별도 터미널에서 `codex login` 후 resume 해야 한다.
+   - `3` → **Codex quota 소진** → `code-review` skill 로 자동 fallback 가능. report 에 `fallback_used: code-review (codex quota)` 기록. fallback 결과는 self-review 로 취급하고 `LGTM:YES` 로 승격하지 않는다.
    - 기타 → 에러 보고
 2. result 파일 Read — 본문이 비어있거나 *"리뷰 못 함"* 류면 STOP. fake 응답 생성 절대 금지.
 3. 호출자에게 **result 파일 절대경로 + 본문 verbatim** 둘 다 전달.
@@ -64,34 +64,32 @@ Codex 의 출력 형식 (CRITICAL/HIGH/MEDIUM/LGTM 같은 분류) 은 *Codex 가
 
 ## Failure Behavior (정책)
 
-### exit 2 — 로그인 필요 (자동 Codex fallback)
+### exit 2 — 로그인 필요 (fallback 금지)
 
-> **2026-05-20 정합화**: `SKILL.md "자동 결정 매핑"` 표 (line 80) + `harness-review/SKILL.md` 의 fallback 정책에 맞춰 *자동 Codex fallback* 으로 변경. 이전 "fallback 절대 금지, 사용자 대기" 정책은 noask 기본 흐름과 충돌해 폐기.
+> **2026-05-22 정합화**: 로그인 필요는 복구 가능한 독립 리뷰 차단 상태다. self-review fallback 으로 대체하면 독립 검증 신뢰가 사라지므로 fallback 금지.
 
 ```markdown
-⚠️ Codex 로그인 필요 (exit 2) → Codex fallback 자동 전환
+🔓 Codex 로그인 필요 (exit 2) → BLOCKED / DEPENDENCY_MISSING
 
-- Code review 요청 → `code-review` skill 또는 `code-reviewer` agent (Codex)로 재실행
-- Plan critique 요청 → Codex self critique
-- 진행 보고에 `fallback_used: code-review (codex auth)` 필드 명시
-- self-review bias 안내 1줄 출력 (사용자 인지 후 진행)
+- 새 터미널에서 `codex login` 실행 후 `/harness resume <REQUEST_ID|path>` 로 재개
+- 진행 보고에 `fallback_used: blocked-codex-auth` 필드 명시
+- report 에 BLOCKED 사유와 재개 조건 기록
 
-(사용자가 Codex 재진입을 원하면 별도 터미널에서 `codex login` 후 다음 호출부터 자연 복구.)
 ```
 
-자동 fallback OK. report 에 `fallback_used` 기록.
+fallback 금지.
 
 ### exit 3 — Quota 소진 (Codex fallback)
 
 ```markdown
-⚠️ Codex quota 소진 (exit 3) → Codex fallback 자동 전환
+⚠️ Codex quota 소진 (exit 3) → code-review fallback 자동 전환
 
-- Code review 요청 → `code-review` skill / `code-reviewer` agent
 - Plan critique 요청 → Codex self critique
 - 진행 보고에 `fallback_used: code-review (codex quota)` 필드 명시
+- fallback 결과는 self-review 로 취급하고 `LGTM:YES` 로 승격 금지
 ```
 
-자동 fallback OK.
+자동 fallback OK. 단, 독립 리뷰가 아니므로 `LGTM:YES` 금지.
 
 ## Rules
 

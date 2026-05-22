@@ -1,6 +1,6 @@
 ---
 name: harness-review
-description: harness step5 외부 Codex 리뷰 wrapper. file-list MD 작성 → codex exec 한 줄 프롬프트 호출 → result.md Read → 호출자에 verbatim 반환의 4단계 절차. self-review bias 차단을 위해 외부 verifier 로 동작. Codex 인증 실패(exit 2) 또는 quota 소진(exit 3) 시 code-review skill 로 자동 fallback + fallback_used 필드 명시.
+description: harness step5 외부 Codex 리뷰 wrapper. file-list MD 작성 → codex exec 한 줄 프롬프트 호출 → result.md Read → 호출자에 verbatim 반환의 4단계 절차. self-review bias 차단을 위해 외부 verifier 로 동작. Codex 로그인 필요(exit 2)는 fallback 금지, quota 소진(exit 3)만 code-review skill fallback + fallback_used 필드 명시.
 ---
 
 # harness-review
@@ -31,18 +31,18 @@ description: harness step5 외부 Codex 리뷰 wrapper. file-list MD 작성 → 
 `codex exec` exit code 별 처리:
 
 - **exit 0** — 정상. 결과 파일 Read 후 호출자에 반환.
-- **exit 2 (로그인 필요)** — 사용 가능한 Codex 리뷰 helper 또는 호출자 Codex 직접 리뷰로 자동 fallback. `fallback_used=codex-review-fallback (auth)` 필드 명시 + report 에 기록. self-review bias 안내 후 진행. workflow.md "자동 결정 매핑" 표의 80번째 줄 정책과 일치.
-- **exit 3 (quota 소진)** — `code-review` skill 자동 fallback. `fallback_used=code-review (codex quota)` 필드 명시.
+- **exit 2 (로그인 필요)** — fallback 금지. `BLOCKED / DEPENDENCY_MISSING` 으로 기록하고 사용자가 새 터미널에서 `codex login` 후 resume 하게 한다. 독립 리뷰가 빠진 self-review 를 LGTM 으로 승격하지 않는다.
+- **exit 3 (quota 소진)** — `code-review` skill 자동 fallback. `fallback_used=code-review (codex quota)` 필드 명시. fallback 결과는 self-review 로 취급하고 `LGTM:YES` 승격 금지.
 - **기타 exit code** — STOP, 사용자/호출자 보고. fake 응답 생성 절대 금지.
 
-> **2026-05-20 정합화 노트**: 원본 agent 파일의 "exit 2 fallback 금지" 정책은 Codex 포팅본에서 사용하지 않는다. 본 skill 이 step5 호출의 primary entry point 이며, SKILL.md "자동 결정 매핑" 표가 최종 진실 원천.
+> **2026-05-22 정합화 노트**: exit 2 는 로그인 상태 문제라 독립 Codex 리뷰를 재개할 수 있으므로 fallback 하지 않는다. exit 3 quota 소진만 self-review fallback 을 허용하되 `LGTM:YES` 로 승격하지 않는다.
 
 ## 결과 양식
 
 ```
 Codex 리뷰 완료
 결과: <project>/.harness/reviews/codex-review-<slug>-result.md
-fallback_used: <none | codex-review-fallback (auth) | code-review (codex quota)>
+fallback_used: <none | blocked-codex-auth | code-review (codex quota)>
 
 (이하 result.md 본문 verbatim)
 ```
@@ -51,5 +51,5 @@ fallback_used: <none | codex-review-fallback (auth) | code-review (codex quota)>
 
 - 본문 절차 정본: [`docs/procedures/codex-review-procedure.md`](../harness/docs/procedures/codex-review-procedure.md)
 - helper 기준: 사용 가능한 Codex helper/sub-agent가 있으면 동일 절차를 맡기고, 없으면 호출자 Codex가 직접 수행한다.
-- Fallback: 사용 가능한 Codex 리뷰 helper 또는 호출자 Codex 직접 리뷰.
+- Fallback: exit 3 quota 소진 시에만 사용. exit 2 로그인 필요는 BLOCKED 로 멈춘다.
 - 사용자 진입점: `/harness-review` 슬래시 커맨드
