@@ -21,6 +21,7 @@ if ([string]::IsNullOrWhiteSpace($SkillsDir)) {
 } else {
     $skillsRoot = [System.IO.Path]::GetFullPath((Join-Path (Get-Location).Path $SkillsDir))
 }
+$agentsRoot = Join-Path $codexHomeFull "agents"
 
 $managedSkillNames = @(
     "harness",
@@ -29,6 +30,13 @@ $managedSkillNames = @(
     "harness-review",
     "harness-deep-researcher",
     "harness-customer-user"
+)
+
+$managedAgentNames = @(
+    "codex-reviewer",
+    "harness-customer-user",
+    "harness-deep-researcher",
+    "harness-qa-engineer"
 )
 
 $scriptRoot = if ([string]::IsNullOrWhiteSpace($PSScriptRoot)) {
@@ -100,6 +108,7 @@ function Convert-ToCodexText {
         $result = $result.Replace($key, $replacements[$key])
     }
 
+    $result = $result.Replace("Claude", "Codex")
     $result = $result -replace 'subagent_type=', 'role='
     $result = $result -replace 'subagent_type\s*=\s*"([^"]+)"', 'role="$1"'
     $result = $result -replace 'agent_type=', 'role='
@@ -438,6 +447,10 @@ try {
         @{ s = "skills/harness/docs/procedures/codex-review-procedure.md"; d = "harness/docs/procedures/codex-review-procedure.md"; t = "minimal" },
         @{ s = "skills/harness/docs/procedures/customer-test-procedure.md"; d = "harness/docs/procedures/customer-test-procedure.md"; t = "minimal" },
         @{ s = "skills/harness/docs/procedures/deep-research-procedure.md"; d = "harness/docs/procedures/deep-research-procedure.md"; t = "minimal" },
+        @{ s = "skills/harness/agents/codex-reviewer.md"; d = "harness/agents/codex-reviewer.md"; t = "minimal" },
+        @{ s = "skills/harness/agents/harness-customer-user.md"; d = "harness/agents/harness-customer-user.md"; t = "minimal" },
+        @{ s = "skills/harness/agents/harness-deep-researcher.md"; d = "harness/agents/harness-deep-researcher.md"; t = "minimal" },
+        @{ s = "skills/harness/agents/harness-qa-engineer.md"; d = "harness/agents/harness-qa-engineer.md"; t = "minimal" },
         @{ s = "skills/harness/agents/learning/README.md"; d = "harness/agents/learning/README.md"; t = "minimal" },
         @{ s = "skills/harness/agents/learning/harness-customer-user.md"; d = "harness/agents/learning/harness-customer-user.md"; t = "minimal" },
         @{ s = "skills/harness/agents/learning/harness-deep-researcher.md"; d = "harness/agents/learning/harness-deep-researcher.md"; t = "minimal" },
@@ -485,7 +498,6 @@ try {
             $reason = "not part of Codex runtime surface"
             if ($rel -like "commands/*") { $reason = "Claude Code slash command file; not consumed directly by Codex" }
             elseif ($rel -eq "README.md") { $reason = "distribution documentation; not runtime" }
-            elseif ($rel -like "skills/harness/agents/*.md") { $reason = "user-level agent registry file; helper skills/procedures are used instead" }
             elseif ($rel -in @("skills/harness/.version", "skills/harness/.gitattributes", ".gitignore")) { $reason = "upstream metadata; Codex package owns generated metadata" }
             $excluded.Add([pscustomobject]@{ source = $rel; reason = $reason }) | Out-Null
         }
@@ -514,6 +526,7 @@ try {
             upstream_ref = $Ref
             upstream_commit = $upstreamCommit
             skills_root = $skillsRoot
+            agents_root = $agentsRoot
             forbidden_hits = $forbidden
             broken_links = $brokenLinks
             bash_n_bootstrap = $bashCheck
@@ -522,7 +535,7 @@ try {
         throw "Staged Harness port failed validation. See $reportRoot\failed-$stamp.json"
     }
 
-    New-Item -ItemType Directory -Force -Path $skillsRoot | Out-Null
+    New-Item -ItemType Directory -Force -Path $skillsRoot, $agentsRoot | Out-Null
     $existing = New-Object System.Collections.Generic.List[string]
     foreach ($name in $managedSkillNames) {
         $path = Join-Path $skillsRoot $name
@@ -547,6 +560,26 @@ try {
         Copy-Directory -Source (Join-Path $stageRoot $name) -Destination (Join-Path $skillsRoot $name)
     }
 
+    $existingAgents = New-Object System.Collections.Generic.List[string]
+    foreach ($name in $managedAgentNames) {
+        $path = Join-Path $agentsRoot "$name.md"
+        if (Test-Path -LiteralPath $path) { $existingAgents.Add($path) | Out-Null }
+    }
+    if ($existingAgents.Count -gt 0 -and -not $NoBackup) {
+        $agentBackupRoot = Join-Path $backupRoot "agents"
+        New-Item -ItemType Directory -Force -Path $agentBackupRoot | Out-Null
+        foreach ($path in $existingAgents) {
+            Move-Item -LiteralPath $path -Destination (Join-Path $agentBackupRoot (Split-Path -Leaf $path))
+        }
+    } else {
+        foreach ($path in $existingAgents) {
+            Remove-Item -LiteralPath $path -Force
+        }
+    }
+    foreach ($name in $managedAgentNames) {
+        Copy-ExactFile -Source (Join-Path $stageRoot "harness/agents/$name.md") -Destination (Join-Path $agentsRoot "$name.md")
+    }
+
     $classificationPath = Join-Path $reportRoot "classification-$stamp.md"
     Write-ClassificationMarkdown -Path $classificationPath -UpstreamCommit $upstreamCommit -Records $records.ToArray() -Excluded $excluded.ToArray() -SkillsRoot $skillsRoot
 
@@ -558,7 +591,8 @@ try {
         upstream_commit = $upstreamCommit
         codex_home = $codexHomeFull
         skills_root = $skillsRoot
-        backup_root = if ($existing.Count -gt 0 -and -not $NoBackup) { $backupRoot } else { "" }
+        agents_root = $agentsRoot
+        backup_root = if (($existing.Count -gt 0 -or $existingAgents.Count -gt 0) -and -not $NoBackup) { $backupRoot } else { "" }
         classification = $classificationPath
         counts = [pscustomobject]@{
             exact_copy = @($records | Where-Object { $_.category -eq "exact-copy" }).Count
@@ -571,6 +605,7 @@ try {
         }
         bash_n_bootstrap = $bashCheck
         installed_skill_names = $managedSkillNames
+        installed_agent_names = $managedAgentNames
         codex_overlays = $overlayRecords
         installed = $records
         excluded = $excluded
@@ -580,6 +615,7 @@ try {
 
     Write-Output "harness-update complete"
     Write-Output "skills_root=$skillsRoot"
+    Write-Output "agents_root=$agentsRoot"
     Write-Output "upstream_commit=$upstreamCommit"
     Write-Output "exact_copy=$($report.counts.exact_copy)"
     Write-Output "minimal_codex_port=$($report.counts.minimal_codex_port)"

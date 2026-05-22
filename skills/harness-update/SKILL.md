@@ -1,6 +1,6 @@
 ---
 name: harness-update
-description: Slash command '/harness-update'. Update the real global Codex skills directory from https://github.com/chdnl0420-svg/Harness without asking questions. Classify upstream files into exact-copy, minimal-Codex-port, and port-required groups, validate a staged Codex port, then replace the managed Harness skills under $CODEX_HOME/skills or ~/.codex/skills automatically.
+description: Slash command '/harness-update'. Update the real global Codex skills directory and Harness custom-agent registrations from https://github.com/chdnl0420-svg/Harness without asking questions. Classify upstream files into exact-copy, minimal-Codex-port, and port-required groups, validate a staged Codex port, then replace the managed Harness skills and agents under $CODEX_HOME automatically.
 ---
 
 # harness-update
@@ -27,9 +27,15 @@ Default behavior:
   - `harness-review`
   - `harness-deep-researcher`
   - `harness-customer-user`
+- Register managed Harness custom agents in `$CODEX_HOME/agents` or `~/.codex/agents`:
+  - `codex-reviewer`
+  - `harness-customer-user`
+  - `harness-deep-researcher`
+  - `harness-qa-engineer`
 - Move existing managed Harness skills and old `ecc-command-harness*` wrappers to `$CODEX_HOME/harness-update-backups/<timestamp>` before replacement.
+- Move existing managed Harness custom-agent files to `$CODEX_HOME/harness-update-backups/<timestamp>/agents/` before replacement.
 - Install only the Codex-supported surface.
-- Do not install Claude Code `commands/`, user-level `agents/`, root `README.md`, upstream `.version`, or `.gitattributes`.
+- Do not install Claude Code `commands/`, root `README.md`, upstream `.version`, or `.gitattributes`.
 - Write reports to `$CODEX_HOME/harness-update-reports/`.
 
 ## Persistent Codex Overlays
@@ -58,6 +64,7 @@ Minimal Codex port:
 - Core docs: `workflow.md`, `donot.md`, `html-output-rule.md`, `test-guide-format.md`
 - Step docs: `docs/steps/*.md`
 - Procedure docs: `codex-review-procedure.md`, `customer-test-procedure.md`, `deep-research-procedure.md`
+- Agent registry files: `agents/codex-reviewer.md`, `agents/harness-customer-user.md`, `agents/harness-deep-researcher.md`, `agents/harness-qa-engineer.md`
 - Learning files: `agents/learning/*.md`
 - Additional templates: `learning-proposal.md`, `plan.md`, `progress.md`, `result.md`, `review.md`, `project-claude.md` as `project-agents.md`
 
@@ -76,7 +83,9 @@ Port required:
 After the script runs, report:
 
 - installed global skills path
+- installed global agents path
 - upstream commit
+- registered managed agent names
 - exact/minimal/ported/excluded counts
 - forbidden-string check result
 - broken relative Markdown link count
