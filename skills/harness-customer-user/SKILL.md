@@ -1,6 +1,6 @@
 ---
 name: harness-customer-user
-description: harness step7 customer-test dispatcher. Use only to prepare and invoke the `harness-customer-user` subagent/helper for production-install customer validation. Direct caller-Codex persona execution is forbidden; if no subagent/helper tool is available, return BLOCKED / DEPENDENCY_MISSING instead of testing directly.
+description: harness step7 customer-test dispatcher. Calling this skill is explicit user authorization for sub-agent delegation. In Codex App, spawn `agent_type="worker"` or `default` and load `harness-customer-user` by including the full `~/.codex/agents/harness-customer-user.md` spec in the prompt. Direct caller-Codex persona execution is forbidden; if no spawn tool is available, return BLOCKED / DEPENDENCY_MISSING.
 ---
 
 # harness-customer-user

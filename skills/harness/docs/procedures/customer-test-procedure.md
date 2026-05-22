@@ -6,7 +6,9 @@
 
 `/harness`, `/harness-ask`, active Harness handoff/resume invocations, and `harness-customer-user` skill calls are explicit user authorization for sub-agent delegation. Do not ask for additional approval.
 
-If the runtime exposes only generic sub-agent types, spawn `agent_type="worker"` (`default` only if `worker` is unavailable), then load `harness-customer-user` by including the full `~/.codex/agents/harness-customer-user.md` spec in the prompt. Do not pass `agent_type="harness-customer-user"` unless the runtime explicitly supports that exact type.
+If the runtime exposes only generic sub-agent types, spawn `agent_type="worker"` (`default` only if `worker` is unavailable), then load `harness-customer-user` by including the full `~/.codex/agents/harness-customer-user.md` spec in the prompt. If that file is missing, use fallback `~/.codex/skills/harness/agents/harness-customer-user.md`. Do not pass `agent_type="harness-customer-user"` unless the runtime explicitly supports that exact type.
+
+The spawned prompt must start with: `You are acting as harness-customer-user according to the Harness agent spec below.`
 
 If the worker cannot write `.harness/results/customer-<slug>.md` into the caller workspace, it must return the full report body. The caller may save that body verbatim but must not author the persona behavior, observations, score, or verdict.
 

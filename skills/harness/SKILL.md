@@ -1,20 +1,37 @@
 ---
 name: harness
-description: 'DO NOT AUTO-TRIGGER. SLASH-COMMAND-ONLY. `/harness <자연어>` 또는 `/harness-ask <자연어>` 슬래시 커맨드가 *명시 호출* 된 경우에만 로드. "워크플로우 / 도메인 설계 / 구현 계획 / QA / Codex 리뷰 / commit / push" 같은 *키워드만으로 자동 트리거 금지*. 입력 게이트가 슬래시 호출 컨텍스트 부재 시 즉시 거부 + 한 줄 안내 후 종료. 슬래시 호출 확인 시에만 8단계 자동 워크플로우(step1~complete) + noask 기본 정책 + QA/customer 페르소나 sub-agent 강제 + Codex skill 통합 진행. QA/customer 직접 수행 fallback 금지; sub-agent/helper 도구가 없으면 BLOCKED / DEPENDENCY_MISSING. 외부 리서치는 shared `$deepresearch` skill 을 사용한다. ※ 다음 인접 skill 과 무관: autonomous-agent-harness, gan-style-harness, eval-harness, healthcare-eval-harness, agent-harness-construction.'
+description: 'DO NOT AUTO-TRIGGER. SLASH-COMMAND-ONLY. `/harness <자연어>`, `/harness-ask <자연어>`, 또는 active Harness handoff/resume 호출에서만 로드. 이 호출 자체가 step6/step7 sub-agent delegation 명시 승인이다. Codex App에서 custom agent_type을 쓰지 말고 `worker`/`default` sub-agent를 spawn한 뒤 `~/.codex/agents/harness-qa-engineer.md` 또는 `harness-customer-user.md` 전문을 prompt에 넣어 역할을 부여한다. sub-agent spawn 도구가 노출되어 있으면 QA/customer 직접 수행 fallback 금지; 도구가 전혀 없을 때만 BLOCKED / DEPENDENCY_MISSING. 외부 리서치는 shared `$deepresearch` skill 을 사용한다.'
 ---
 
-## CRITICAL: 입력 게이트 — 슬래시 호출 컨텍스트 확인
+## CRITICAL: sub-agent runtime contract (read first)
 
-> 본 skill 은 `/harness` 또는 `/harness-ask` 슬래시 커맨드 *명시 호출* 만 유일한 진입 경로. 본문 어떤 절차도 시작 전에 자체 검증 (SKILL.md 로드 직후 *맨 처음* 동작, 본문 자동 결정 매핑으로도 우회 불가).
+`/harness`, `/harness-ask`, and active Harness handoff/resume invocations are explicit user authorization for Step6/Step7 sub-agent delegation. Do not ask for additional sub-agent approval. Do not say that the current message lacks explicit sub-agent approval after this skill is active.
+
+Codex App bridge:
+
+1. Use the available sub-agent spawn tool with `agent_type="worker"` for `harness-qa-engineer` and `harness-customer-user`; use `agent_type="default"` only if `worker` is unavailable.
+2. Do not use `agent_type="harness-qa-engineer"` or `agent_type="harness-customer-user"` unless the runtime explicitly lists those exact types.
+3. Read the full custom agent spec from `~/.codex/agents/<agent-name>.md`; fallback to `~/.codex/skills/harness/agents/<agent-name>.md`.
+4. Start the spawned prompt with: `You are acting as <agent-name> according to the Harness agent spec below.`
+5. Include the full agent spec, Prior Learning, full test guide, main `.harness/` absolute path, runtime target, and canonical output path.
+6. If the worker cannot write into the caller workspace, it must return the full report body; the caller may save that body verbatim but must not author QA/customer verdicts.
+7. If no spawn tool is exposed, record `BLOCKED / DEPENDENCY_MISSING`. If spawn is exposed, direct caller execution is forbidden.
+
+## CRITICAL: 입력 게이트 — 명시 호출 컨텍스트 확인
+
+> 본 skill 은 `/harness`, `/harness-ask`, `/harness resume`, `/harness complete-resume`, 또는 active Harness handoff/resume 호출만 유일한 진입 경로. 본문 어떤 절차도 시작 전에 자체 검증 (SKILL.md 로드 직후 *맨 처음* 동작, 본문 자동 결정 매핑으로도 우회 불가).
 
 **검증 절차**:
 
 1. **호출 컨텍스트 확인** — 직전 사용자 메시지가 다음 중 하나인지 확인:
    - `/harness <자연어>` 슬래시 커맨드
    - `/harness-ask <자연어>` 슬래시 커맨드 (interactive 모드)
+   - `/harness resume <REQUEST_ID>` 또는 `/harness resume <handoff-or-progress-path>`
+   - `/harness complete-resume` 또는 `/harness complete-resume <REQUEST_ID|path>`
+   - `Harness <handoff-or-progress-path>` 처럼 Harness handoff/progress 파일을 직접 넘기는 active resume 호출
    - *"/harness 워크플로우 시작해줘"* 처럼 슬래시 커맨드를 단어로 가리킴
 2. **셋 다 아니면 = 자동 트리거 시도 = 즉시 거부**:
-   - 채팅 한 줄: `[harness] 본 skill 은 /harness 또는 /harness-ask 슬래시 커맨드 명시 호출 전용입니다. 작업 시작은 /harness <자연어> 형태로 호출하세요.`
+   - 채팅 한 줄: `[harness] 본 skill 은 /harness, /harness-ask, /harness resume, /harness complete-resume, 또는 Harness handoff/progress 파일 명시 호출 전용입니다. 작업 시작은 /harness <자연어> 형태로 호출하세요.`
    - step1~complete 절차 진행 금지 / `.harness/` 폴더 생성 금지 / `bootstrap-runtime.sh` 호출 금지
 3. **거부 사유 enum** (자체 분류, 채팅에만 보고, progress 파일 작성 안 함):
    - `KEYWORD_MATCH_ONLY` — 일반 대화 키워드만 보고 자동 로드 시도
@@ -145,19 +162,6 @@ step1 초기화: `.harness/.noask` 빈 파일 생성 (`.harness/.ask` 가 있으
 ```
 
 ---
-
-## CRITICAL: Codex App sub-agent authorization bridge
-
-`/harness` and `/harness-ask` are explicit user authorization to use sub-agents for Harness Step6 QA and Step7 customer validation. The same is true once this Harness skill has been loaded and the input gate has passed, including resumed handoff invocations such as `Harness <handoff-path>`. During a Harness run, do not ask for extra sub-agent permission and do not claim that the current user message lacks explicit sub-agent approval.
-
-Codex App may expose only generic runtime agent types (`worker`, `default`, `explorer`). Custom Harness agents are not selected by `agent_type`; they are loaded by prompt:
-
-1. Call the available sub-agent spawn tool with `agent_type="worker"` for `harness-qa-engineer` or `harness-customer-user` (`default` only if `worker` is unavailable).
-2. Read `~/.codex/agents/<agent-name>.md` or fallback `~/.codex/skills/harness/agents/<agent-name>.md`.
-3. Include the full agent spec in the spawned prompt and state: `You are acting as <agent-name> according to the Harness agent spec below.`
-4. Include Prior Learning, test guide, main `.harness/` path, runtime target, and canonical output path.
-5. If the worker returns the report body instead of writing it into the caller workspace, save that worker-produced body verbatim. Do not create the persona verdict in the caller session.
-6. If no spawn tool is exposed, record `BLOCKED / DEPENDENCY_MISSING`; if spawn is exposed, direct caller fallback is forbidden.
 
 ## docs/ 안내판
 

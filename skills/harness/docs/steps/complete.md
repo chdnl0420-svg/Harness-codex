@@ -17,7 +17,7 @@ step8 commit/push 가 끝난 직후, complete 단계 진입 *전에* 호출자 C
 
 **분기**:
 - **A 선택** → 흐름 1·2·3 그대로 진행. report 의 *"step7 후속 처리"* 섹션에 "사용자 그대로 진행 선택" 한 줄 + customer-<slug>.md 의 *권고 / 있었으면 / 없었으면* 3 섹션 요약 포함.
-- **B 선택** → complete 진입 **하지 않음**. `.harness/.pending-step7-review` 빈 파일 생성 (재호출 시 이 마커로 상태 식별), `report-<slug>.html` 미작성, 사용자에게 한 줄 안내: *"customer-<slug>.md 검토 후 `/harness complete-resume` 또는 새 `/harness` 호출로 재진입"*. 워크플로우는 *일시정지* 상태로 종료.
+- **B 선택** → complete 진입 **하지 않음**. `.harness/.pending-step7-review` 빈 파일 생성 (재호출 시 이 마커로 상태 식별), `report-<slug>.html` 미작성, 사용자에게 한 줄 안내: *"customer-<slug>.md 검토 후 `/harness complete-resume <REQUEST_ID|path>` 또는 `/harness resume <REQUEST_ID|path>` 로 재진입"*. 두 resume 호출 모두 active Harness resume 이며 Step6/Step7 sub-agent delegation 승인을 유지한다. 워크플로우는 *일시정지* 상태로 종료.
 - **C 선택** → 현 워크플로우는 흐름 1·2·3 그대로 *complete 완료 처리* (report 작성 + 종료) **+ 신규 /harness 워크플로우 자동 진입**:
   1. customer-<slug>.md 의 `## 권고` · `## 있었으면 하는 것` · `## 없었으면 하는 것` 3 섹션 본문을 합성해 *신규 한 줄 목표* 생성 (예: *"<원본 slug> 의 step7 개선 — <권고 1>, <있었으면 1>, <없었으면 1>"*).
   2. 신규 워크플로우의 progress 파일에 `auto_triggered_from: <원본 slug>` 필드 자동 기록.

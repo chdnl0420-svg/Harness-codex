@@ -15,10 +15,11 @@
    | `harness-plan-ask` (step2, ask 모드 인터랙티브) | `~/.codex/skills/harness-plan-ask/` | 부재 (2026-05-20 시점). `/harness-ask` 모드 사용 시 호출자 Codex 가 `harness-plan` 본문 + request_user_input 또는 일반 질문 직접 호출로 대체 |
    | `harness-review` (step5 Codex wrapper) | `~/.codex/skills/harness-review/` | 부재. step5 는 `codex exec` 직접 호출 + 결과 Read 절차 (docs/procedures/codex-review-procedure.md) 호출자 Codex 가 직접 수행. Codex 실패 시 `code-review` skill 폴백 |
    | `$deepresearch` | `~/.codex/skills/deepresearch/SKILL.md` | 부재 시 외부 리서치가 필요한 step 은 `BLOCKED / DEPENDENCY_MISSING` |
-   | `harness-qa-engineer` | `~/.codex/agents/harness-qa-engineer.md` | 부재 시 step6 은 `BLOCKED / DEPENDENCY_MISSING`; 직접 QA 금지 |
-   | `harness-customer-user` | `~/.codex/agents/harness-customer-user.md` 및 `~/.codex/skills/harness-customer-user/` | 부재 시 step7 은 `BLOCKED / DEPENDENCY_MISSING`; 직접 고객 페르소나 수행 금지 |
+   | `harness-qa-engineer` | `~/.codex/agents/harness-qa-engineer.md` 또는 fallback `~/.codex/skills/harness/agents/harness-qa-engineer.md` | spec 부재 또는 sub-agent spawn 도구 부재 시 step6 은 `BLOCKED / DEPENDENCY_MISSING`; 직접 QA 금지 |
+   | `harness-customer-user` | `~/.codex/agents/harness-customer-user.md` 또는 fallback `~/.codex/skills/harness/agents/harness-customer-user.md`, 그리고 `~/.codex/skills/harness-customer-user/` | spec 부재 또는 sub-agent spawn 도구 부재 시 step7 은 `BLOCKED / DEPENDENCY_MISSING`; 직접 고객 페르소나 수행 금지 |
 
-   - **검증 절차**: skill 경로는 `SKILL.md`, agent 경로는 `.md` 파일 존재 여부를 확인한다. QA/customer agent 부재 시 `progress-<slug>.md` 에 `subagent_missing=<name>` 을 기록하고 해당 step 진입 시 BLOCKED 처리한다.
+   - **검증 절차**: skill 경로는 `SKILL.md`, agent spec 경로는 `.md` 파일 존재 여부를 확인한다. Codex App에서는 custom agent type 존재를 요구하지 않는다. 대신 실제 호출 시 사용 가능한 spawn 도구가 있으면 `agent_type="worker"` 또는 `agent_type="default"`로 spawn하고 agent spec 전문을 prompt에 넣는다.
+   - QA/customer agent spec 또는 spawn 도구 부재 시 `progress-<slug>.md` 에 `subagent_missing=<name>` 또는 `subagent_spawn_missing=true` 를 기록하고 해당 step 진입 시 BLOCKED 처리한다.
    - **자동 복구 안 함**: 본 step1 도 `bootstrap-runtime.sh` 도 `/harness-setup` 도 부재 skill/helper를 자동 생성하지 않는다. skill 생성은 사용자가 명시 요청 시에만 별도 작업으로 수행한다.
 
 5. **learning 파일 확인 (QA/customer 페르소나)** — 다음 공용 learning 파일이 설치본에 있는지 확인한다. 없으면 helper를 호출하지 말고 해당 step 을 `BLOCKED / DEPENDENCY_MISSING` 으로 처리한다. 호출자 Codex 직접 수행 금지.

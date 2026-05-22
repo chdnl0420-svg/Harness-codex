@@ -1,5 +1,11 @@
 # Handoff — <slug>
 
+## Runtime Resume Contract
+
+This handoff is an active Harness resume artifact. Invoking Harness with this file path is explicit user authorization for Step6/Step7 sub-agent delegation.
+
+Codex App bridge: spawn `agent_type="worker"` (`default` only if `worker` is unavailable), then load the custom Harness agent by including the full `~/.codex/agents/harness-qa-engineer.md` or `~/.codex/agents/harness-customer-user.md` spec in the prompt. Do not pass custom names as `agent_type` unless the runtime explicitly lists them. If spawn is exposed, direct caller QA/customer fallback is forbidden; if no spawn tool is exposed, record `BLOCKED / DEPENDENCY_MISSING`.
+
 ## Summary
 - status: <completed | blocked | paused | failed>
 - latest_review: <run/verdict/result_path>

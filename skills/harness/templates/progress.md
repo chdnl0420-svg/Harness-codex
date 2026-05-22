@@ -79,6 +79,14 @@ current_chunk_blocked_reason: null
 /harness resume <REQUEST_ID>
 ```
 
+또는 이 `progress.md`/handoff 파일 경로를 직접 넘길 수 있다:
+
+```text
+Harness <absolute-path-to-progress-or-handoff.md>
+```
+
+Resume 호출 자체가 Step6/Step7 sub-agent delegation 명시 승인이다. Codex App에서는 custom agent 이름을 `agent_type`으로 쓰지 않는다. `agent_type="worker"` 또는 `agent_type="default"`로 spawn하고 `~/.codex/agents/harness-qa-engineer.md` 또는 `~/.codex/agents/harness-customer-user.md` 전문을 prompt에 넣어 역할을 부여한다. sub-agent spawn 도구가 노출되어 있으면 호출자 Codex 직접 QA/customer fallback 금지.
+
 Codex는 이 progress.md의 `current_step`, `current_iteration`, 산출물 경로를 읽고 해당 지점부터 워크플로우를 재개한다.
 
 ## Notes
