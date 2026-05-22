@@ -27,7 +27,7 @@
 
 ## CRITICAL: Domain Contract 게이트
 
-Step2 도메인 산출물은 `Domain Contract` 섹션을 반드시 포함한다. 단순 요구 요약은 DDD(도메인 주도 설계: 구현 전 업무 경계와 계약을 먼저 고정하는 방식) 로 인정하지 않는다.
+Step2 도메인 산출물은 `Domain Contract` 섹션을 반드시 포함한다. 단순 요구 요약은 DDD(도메인 주도 설계: 구현 전 업무 경계와 계약을 먼저 고정하는 방식) 로 인정하지 않는다. 자세한 DDD/TDD 게이트는 [`../ddd-tdd-gates.md`](../ddd-tdd-gates.md) 를 따른다.
 
 필수 항목:
 
@@ -38,6 +38,10 @@ Step2 도메인 산출물은 `Domain Contract` 섹션을 반드시 포함한다.
 - upstream/downstream 의존성: 선행 계약과 후속 영향
 - missing contract: 아직 존재하지 않아 구현을 막는 계약
 - 구현 전 block 조건: 구현 시작 전에 충족되어야 하는 조건
+- public contracts: API, UI, IPC, persistence, permission, validation, event 중 변경 또는 보존해야 하는 계약
+- invariants: 변경 후에도 반드시 참이어야 하는 업무 규칙
+- commands/events: 사용자가 실행하는 명령과 관찰 가능한 도메인 이벤트
+- contract examples: Given/When/Then 예시. 이후 red test 와 QA 시나리오의 원천이다.
 
 예시:
 
@@ -50,6 +54,9 @@ Step2 도메인 산출물은 `Domain Contract` 섹션을 반드시 포함한다.
 - Upstream/downstream: Plan A backend contract → renderer selector
 - Missing contract: BgSession.backend, NewSessionInput.backend
 - Block before implementation: missing contract 존재 시 관련 chunk BLOCKED
+- C1 public contract: NewSessionInput.backend accepts only configured backend ids
+- C1 invariant: backend 선택 후 저장된 세션은 같은 backend 로 복원된다
+- C1 example: Given backend A is selected, When session is launched, Then the created session records backend A
 ```
 
 검증 규칙:
@@ -57,6 +64,7 @@ Step2 도메인 산출물은 `Domain Contract` 섹션을 반드시 포함한다.
 - `missing contract` 가 비어 있지 않으면 관련 chunk 는 step3 에서 자동 `BLOCKED / CONTRACT_MISSING` 또는 `BLOCKED / DEPENDENCY_MISSING` 으로 표시한다.
 - 도메인 경계 위반 파일이 step4 diff 에 포함되면 step4 완료 불가다.
 - Domain Contract 섹션이 없으면 step3 진입 금지. noask 모드라도 step2 산출물을 재작성한다.
+- `contract examples` 가 비어 있으면 step3 진입 금지. 테스트로 바꿀 예시가 없는 계약은 구현 가능한 계약으로 보지 않는다.
 
 ## 외부 리서치 호출 — Single Source
 

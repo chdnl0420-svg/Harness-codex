@@ -28,6 +28,13 @@
 - F2: ...
 - F3: ...
 
+## Domain Contract Coverage
+Step2 `Domain Contract` 와 Step3 `Contract Traceability Matrix` 에서 온 계약을 그대로 적는다.
+
+| contract_id | domain term/rule | covered scenario | evidence type | required |
+|---|---|---|---|---|
+| C1 | <업무 규칙> | F1 | <evidence> | YES |
+
 ## 기능별 정상 흐름
 ### F1: <이름>
 - 입력/조작: ...
@@ -40,6 +47,12 @@
 ## 경계 / 오용 케이스
 - F1 에 빈 입력 / 최대 길이 / 특수문자 ...
 - F2 에 잘못된 권한 / 중복 / 동시성 ...
+
+## Contract-Violating Cases
+API, UI, IPC, persistence, permission, validation, event, state boundary 계약을 일부러 깨는 입력이나 상태를 적는다.
+
+- C1-V1: Given <계약 위반 상태>, When <행동>, Then <거부/오류/복구 기준>
+- C2-V1: ...
 
 ## 회귀 위험 영역
 이번 변경이 기존 기능 중 어디를 깨뜨릴 수 있나.

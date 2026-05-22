@@ -82,11 +82,13 @@
 **필수 산출 섹션** (`implementation-<slug>.md` 에 반드시 들어가야 함):
 - **변경 대상 파일 목록** — 수정/신규 구분, 절대 경로
 - **기존 코드 영향 영역** — 1번 탐색 결과
+- **Contract/Test Trace** — Step2 `Domain Contract` 의 contract_id 별로 허용 파일, 구현 단계, `evidence_mode`(`STRICT_RED`/`CHARACTERIZATION`/`STATIC_ONLY`), 실행 명령, expected red/current, expected green, QA evidence 를 연결. 보통 chunk 는 compact table 로 충분하며, 고위험 chunk 는 [`../ddd-tdd-gates.md`](../ddd-tdd-gates.md) 의 full matrices 를 따른다.
+- **Test Design Matrix** — full matrices 가 필요한 경우 각 contract_id 별 evidence_mode, test size(small/medium/large), test type, 실행 명령, expected red/current, expected green 을 기록. `STRICT_RED` 가 기본이며 `CHARACTERIZATION`/`STATIC_ONLY` 는 plan 안에 이유를 명시해야 한다.
 - **단계별 구현 순서** — 각 단계의 *입력 / 작업 / 검증 방법* 3축
 - **테스트 전략** — 어떤 레벨(unit/integration/e2e) 로 무엇을 검증
 - **위험·롤백 경로** — 실패 시 되돌리는 방법
 
-위 5개 섹션 중 하나라도 비어 있으면 step4 진입 금지. 누락된 섹션은 plan skill 재호출 또는 메인이 직접 채운다.
+위 7개 섹션 중 하나라도 비어 있으면 step4 진입 금지. 누락된 섹션은 plan skill 재호출 또는 메인이 직접 채운다. Step2 `Domain Contract` 의 contract_id 가 matrix 에 없으면 step4 진입 금지.
 
 **제약**:
 - plan 본문에 *"적절히"*, *"필요시"*, *"어떻게든"* 같은 모호어 등장 시 step4 가 추측 코딩으로 빠진다. 발견되면 구체화 후 진행.
@@ -162,7 +164,7 @@ overview 에 `pending` 과 `blocked` 가 같은 chunk 에 동시에 존재하면
 
 ### Step 4: 첫 chunk 의 implementation plan 작성
 
-`chunk-1` (의존성 없는 가장 첫 chunk) 의 `.harness/implementation-<slug>-chunk-1.html` 작성. 양식은 단일 모드의 *필수 산출 섹션* (변경 대상 파일 목록 / 기존 코드 영향 영역 / 단계별 구현 순서 / 테스트 전략 / 위험·롤백 경로) 그대로. 단 *해당 chunk 범위* 로만 한정.
+`chunk-1` (의존성 없는 가장 첫 chunk) 의 `.harness/implementation-<slug>-chunk-1.html` 작성. 양식은 단일 모드의 *필수 산출 섹션* (변경 대상 파일 목록 / 기존 코드 영향 영역 / Contract-Test Trace 또는 full matrices / 단계별 구현 순서 / 테스트 전략 / 위험·롤백 경로) 그대로. 단 *해당 chunk 범위* 로만 한정.
 
 ### Chunk Loop 동작 (step4~6 의 사이클)
 

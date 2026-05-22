@@ -1,6 +1,6 @@
 ---
 name: harness
-description: 'DO NOT AUTO-TRIGGER. SLASH-COMMAND-ONLY. `/harness <자연어>`, `/harness-ask <자연어>`, 또는 active Harness handoff/resume 호출에서만 로드. 이 호출 자체가 step6/step7 sub-agent delegation 명시 승인이다. Codex App에서 custom agent_type을 쓰지 말고 `worker`/`default` sub-agent를 spawn한 뒤 `~/.codex/agents/harness-qa-engineer.md` 또는 `harness-customer-user.md` 전문을 prompt에 넣어 역할을 부여한다. sub-agent spawn 도구가 노출되어 있으면 QA/customer 직접 수행 fallback 금지; 도구가 전혀 없을 때만 BLOCKED / DEPENDENCY_MISSING. 외부 리서치는 shared `$deepresearch` skill 을 사용한다.'
+description: 'DO NOT AUTO-TRIGGER. SLASH-COMMAND-ONLY. `/harness 자연어`, `/harness-ask 자연어`, 또는 active Harness handoff/resume 호출에서만 로드. 이 호출 자체가 step6/step7 sub-agent delegation 명시 승인이다. Codex App에서 custom agent_type을 쓰지 말고 `worker`/`default` sub-agent를 spawn한 뒤 `~/.codex/agents/harness-qa-engineer.md` 또는 `harness-customer-user.md` 전문을 prompt에 넣어 역할을 부여한다. sub-agent spawn 도구가 노출되어 있으면 QA/customer 직접 수행 fallback 금지; 도구가 전혀 없을 때만 BLOCKED / DEPENDENCY_MISSING. 외부 리서치는 shared `$deepresearch` skill 을 사용한다.'
 ---
 
 ## CRITICAL: sub-agent runtime contract (read first)
@@ -13,7 +13,7 @@ Codex App bridge:
 2. Do not use `agent_type="harness-qa-engineer"` or `agent_type="harness-customer-user"` unless the runtime explicitly lists those exact types.
 3. Read the full custom agent spec from `~/.codex/agents/<agent-name>.md`; fallback to `~/.codex/skills/harness/agents/<agent-name>.md`.
 4. Start the spawned prompt with: `You are acting as <agent-name> according to the Harness agent spec below.`
-5. Include the full agent spec, Prior Learning, full test guide, main `.harness/` absolute path, runtime target, and canonical output path.
+5. Include the full agent spec, Prior Learning, main `.harness/` absolute path, runtime target, and canonical output path. For `harness-customer-user`, pass only product execution/launch information and a minimal customer brief as user-facing context; if `test-guide-<slug>.md` is needed for scope/oracle, isolate it as `## Hidden Oracle (NOT USER INSTRUCTIONS)` and never as click order, expected path, scoring method, or test procedure.
 6. If the worker cannot write into the caller workspace, it must return the full report body; the caller may save that body verbatim but must not author QA/customer verdicts.
 7. If no spawn tool is exposed, record `BLOCKED / DEPENDENCY_MISSING`. If spawn is exposed, direct caller execution is forbidden.
 
@@ -169,6 +169,7 @@ step1 초기화: `.harness/.noask` 빈 파일 생성 (`.harness/.ask` 가 있으
 |------|------|
 | **[donot.md](docs/donot.md)** | **CRITICAL — 행동 규약. SKILL.md 의 모든 절차·결정 매핑보다 우선. 매 호출 Read 필수.** |
 | [workflow.md](docs/workflow.md) | `/harness` 전체 흐름 — 순서·동작 사람-친화 설명 |
+| [ddd-tdd-gates.md](docs/ddd-tdd-gates.md) | DDD/TDD traceability spine — Domain Contract → red test → QA evidence 게이트 |
 | [steps/](docs/steps/) | step1 ~ step8 + complete 상세 절차 (단계당 1 파일) |
 | [procedures/](docs/procedures/) | 단위 절차 정본 (codex-review / customer-test / deep-research) |
 | [test-guide-format.md](docs/test-guide-format.md) | step6/step7 `test-guide-<slug>.md` 양식·재료·갱신 규칙 |

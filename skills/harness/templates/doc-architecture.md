@@ -50,6 +50,16 @@
 |------|------|----------|------------|
 | {모듈 A} | {한 줄} | {누가 부르는지} | {뭘 부르는지} |
 
+## 도메인 계약
+
+| contract_id | bounded context | public contract | invariant | upstream/downstream | owner |
+|---|---|---|---|---|---|
+| C1 | {경계} | {API/UI/IPC/persistence/permission/validation/event} | {항상 참이어야 하는 규칙} | {의존 관계} | {모듈/팀} |
+
+변경 규칙:
+- contract_id 가 있는 계약은 구현 계획, red test, QA evidence 에서 같은 id 로 추적한다.
+- missing contract 가 있으면 관련 구현 chunk 는 `BLOCKED / CONTRACT_MISSING` 으로 둔다.
+
 ## 환경 변수
 
 - `{NAME}` — {용도, 필수/선택}

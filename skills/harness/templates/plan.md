@@ -45,6 +45,18 @@ research_count: 0
 - [ ] <measurable criterion 2>
 - [ ] Codex 리뷰 LGTM (Step 5)
 
+### Domain Contract Traceability
+
+| contract_id | domain term/rule | files allowed | files forbidden | implementation step | red test | QA evidence |
+|---|---|---|---|---|---|---|
+| C1 | <rule> | <paths> | <paths> | <step> | <red artifact> | <evidence> |
+
+### Test Design Matrix
+
+| test_id | contract_id | test size | test type | command | expected red | expected green |
+|---|---|---|---|---|---|---|
+| T1 | C1 | small/medium/large | unit/contract/component/e2e | <cmd> | <failure> | <pass> |
+
 ### Estimated Time: <minutes>
 
 ---

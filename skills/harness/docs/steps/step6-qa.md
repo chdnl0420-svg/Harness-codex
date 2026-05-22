@@ -38,6 +38,7 @@ Codex App bridge:
    - 가이드 없이는 절대 테스트 시작 금지
    - 각 시나리오에는 기대 evidence type 을 명시한다. 허용 enum: `screenshot | click_trace | dom_assertion | network_trace | ipc_trace | persisted_state_trace | restore_trace | unit_test | static_assertion | computed_style_assertion`.
    - async send, IPC, persistence, localStorage/sessionStorage 변경 시나리오는 `static_assertion` 만으로 PASS 처리할 수 없다.
+   - `Domain Contract Coverage` 와 `Contract-Violating Cases` 섹션이 있어야 한다. Step2/Step3 의 contract_id 중 빠진 항목이 있으면 QA 호출 전 `BLOCKED / GUIDE_MISSING`.
 3. `harness-qa-engineer` 에 위임:
    - **sub-agent/helper 호출 필수.** 호출자 Codex가 같은 입력으로 직접 QA를 수행하거나 PASS/FAIL을 판정하는 fallback 금지.
    - 사용 가능한 sub-agent/helper 도구로 `harness-qa-engineer` 를 호출할 수 없으면 즉시 `BLOCKED / DEPENDENCY_MISSING` 으로 기록하고 step7 진입 금지.

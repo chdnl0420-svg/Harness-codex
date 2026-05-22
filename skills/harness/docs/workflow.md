@@ -12,7 +12,7 @@ Required bridge:
 2. Never pass `agent_type="harness-qa-engineer"` or `agent_type="harness-customer-user"` unless the runtime explicitly lists those exact values as valid agent types.
 3. Read the matching custom agent spec from `~/.codex/agents/<agent-name>.md` first. If missing, read `~/.codex/skills/harness/agents/<agent-name>.md`.
 4. Put the full agent spec into the spawned worker prompt with this sentence before it: `You are acting as <agent-name> according to the Harness agent spec below.`
-5. Prepend Prior Learning, the full `test-guide-<slug>.md`, main repo `.harness/` absolute path, runtime target details, and the required output path.
+5. Prepend Prior Learning, main repo `.harness/` absolute path, runtime target details, and the required output path. For `harness-qa-engineer`, include the full `test-guide-<slug>.md` as test input. For `harness-customer-user`, include only product execution/launch information and a minimal customer brief as user-facing context; if the guide is needed, isolate it as `## Hidden Oracle (NOT USER INSTRUCTIONS)` and never present click order, expected path, scoring method, or test procedure as persona instructions.
 6. If the spawned worker cannot write into the caller workspace, it must return the full report body. The caller may only save that verbatim worker-produced report to the canonical output path; the caller must not author the QA/customer verdict.
 7. If no sub-agent spawning tool is exposed at all, record `BLOCKED / DEPENDENCY_MISSING`. If the tool is exposed, direct caller execution is forbidden.
 
@@ -361,7 +361,7 @@ TEST_COVERAGE | BUILD_FAILURE | OTHER
 
 ## 테스트 가이드 문서 (`.harness/test-guide-<slug>.md`)
 
-step6 / step7 두 도우미가 동일 기준으로 테스트하도록 호출자 Codex 가 step6 의 1단계로 작성하는 입력 문서.
+step6 에서는 QA 도우미가 동일 기준으로 검증하도록 호출자 Codex 가 step6 의 1단계로 작성하는 입력 문서다. step7 에서는 커스터머 도우미에게 테스트 진행 방법으로 전달하지 않고, 필요한 경우 숨은 범위/채점표(`## Hidden Oracle (NOT USER INSTRUCTIONS)`) 로만 격리한다. 커스터머 도우미의 사용자-facing 입력은 production 실행 정보와 최소 제품 설명뿐이다.
 
 양식·작성 재료·갱신 규칙: [test-guide-format.md](test-guide-format.md)
 
