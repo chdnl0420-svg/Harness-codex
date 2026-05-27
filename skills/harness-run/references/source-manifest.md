@@ -1,0 +1,29 @@
+# Source Manifest
+
+| Path | Bytes | Lines | SHA256 |
+|---|---:|---:|---|
+| D:\Project\Harness2\plugins\harness\.claude-plugin\plugin.json | 732 | 14 | 36EFD2C6B0CCDE35D4AADB9604A72A1C2F5CA9C2AF9B9BEC0E11B7DF3BDEEF20 |
+| D:\Project\Harness2\plugins\harness\skills\run\SKILL.md | 25064 | 325 | 8F6942820D73FF14E9535DCCC9AADB1DCCE1636AF29C71D4E2328649F80EB340 |
+| D:\Project\Harness2\plugins\harness\skills\run\docs\workflow.md | 10304 | 170 | 55255BA87B14335E4A44C3C6DFACD2430F1610A64E12DC9CFB225494689BD70F |
+| D:\Project\Harness2\plugins\harness\skills\run\docs\code-structure.md | 7674 | 147 | 857EC2CFC0E34215D5CC39F4643F3370FB2A1F4752BE70B6873DA328E5D6482F |
+| D:\Project\Harness2\plugins\harness\skills\run\docs\run-modes.md | 7693 | 121 | F551E89E8232F9E864B7EAF5A33F23024A25BEE03CAE3F71510795C8DB5DC20B |
+| D:\Project\Harness2\plugins\harness\skills\run\docs\steps\01-detect.md | 22224 | 393 | 3AD1A2DFDC0433DAEC82962C5A2F454BB7604E84525E2D21A8BF6229894FD871 |
+| D:\Project\Harness2\plugins\harness\skills\run\docs\steps\02-domain.md | 2961 | 46 | 1F813820BA1B841CE254B670B237A719A4B439EE8838A6A50DBE2E2F379E2B15 |
+| D:\Project\Harness2\plugins\harness\skills\run\docs\steps\03-tdd.md | 3986 | 90 | AC231044ACF4005D9D5473023F45E83D62B23F9785B719E333B9F8BA24F14B06 |
+| D:\Project\Harness2\plugins\harness\skills\run\docs\steps\04-qa.md | 3936 | 63 | 7FCDB0D7E2F29A4148654B2151D2CDB7F49583C95CB303C8E46E90052B078DF7 |
+| D:\Project\Harness2\plugins\harness\skills\run\docs\steps\05-review.md | 9377 | 172 | C65019D7306E85D3B98A2CE8312EE5E50A6B0DDA4F3943F021824C1304906ABC |
+| D:\Project\Harness2\plugins\harness\skills\run\docs\steps\06-customer.md | 5120 | 70 | DD2B9318D3A430808ABB349FBA9F52FD24F3E6F3BA6ABD45D33651F333DEDFCD |
+| D:\Project\Harness2\plugins\harness\skills\run\docs\steps\07-audit.md | 13946 | 216 | 988988A9874D3179CC83319425C74355B58231F153D34AF050ADCD42A36E78CA |
+| D:\Project\Harness2\plugins\harness\skills\run\docs\steps\08-summary.md | 2703 | 47 | D7FC959F5C19597B05616B3CA1E98F0C54E728C2AE31B96E7F2694B31450A3D8 |
+| D:\Project\Harness2\plugins\harness\skills\run\docs\steps\09-commit.md | 6093 | 80 | F1D5ADA699BE908D0B9B19F3D511ABAEED70C2C0B2D01C1834CA59E9FC150A2B |
+| D:\Project\Harness2\plugins\harness\agents\codex-reviewer.md | 6394 | 178 | 2092E81CBE0E149841DCAC4C4174C77CEB7BCAA541E9026E91ED6F24DBCEEDA6 |
+| D:\Project\Harness2\plugins\harness\agents\harness-customer-user.md | 24974 | 431 | D6703D71092AEAC7E565D46F71695C967FF06CF59B012F745D3D797CBCFC0AFB |
+| D:\Project\Harness2\plugins\harness\agents\harness-engineering-researcher.md | 2583 | 68 | 435189EAAD2C20F89FFBD715ED5259E6441CDF0AAF1902F3A607B900BF243CFD |
+| D:\Project\Harness2\plugins\harness\agents\harness-engineering-qa.md | 2959 | 79 | D6BFDF5547769550F6AEE63EDC265A90A180ACB17025FA0255AC55E39856E083 |
+| D:\Project\Harness2\plugins\harness\agents\harness-engineering-auditor.md | 8679 | 194 | AB279BD57568C19C7353D9488E7DCF47E2207A22638A715CBC43BAB249B0309B |
+| D:\Project\Harness2\plugins\harness\agents\planner.md | 8115 | 226 | 6388400FC37D32F9A10B4107907093F955EFE8BAD7F23591AACDEEB53D45A7E9 |
+| D:/Project/Harness2/docs/superpowers/specs/2026-05-26-harness-plugin-design.md | 19519 | 346 | 00C4C881D89BAFA33C4E3AAB3CBBD4470D235BF9658C876533577D95C3B1D12B |
+| D:/Project/Harness2/docs/DRYRUN.md | 4275 | 92 | 61E726B3B5B6578EF0EAE56BBAFB803C6D7CA3915D30C2052A931399DAF5294E |
+| D:/Project/Harness2/scripts/dryrun.ps1 | 9697 | 214 | C58A3083357E2B5D4440AA2C0B945401DC2C46539005A0B7B3E345175235B4F5 |
+| D:/Project/Harness2/.harness-test/.harness/runs/20260526T140441Z-cart-discount/07-audit/verdict.md | 3098 | 58 | 3791F7DD0039D9C0CCAB07DA7BEB7CCB4686DF162ABE21E51D0B71222B54D997 |
+| D:/Project/Harness2/.harness-test/.harness/runs/20260526T140441Z-cart-discount/07-audit/skill-improvement.md | 1866 | 19 | B2D2290C212BA8F5152617665B1CD0ECBA7009B8D728844A6A1AFC6F11ABA8B4 |

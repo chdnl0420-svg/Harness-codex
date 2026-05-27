@@ -1,0 +1,4 @@
+interface:
+  display_name: "Harness Run"
+  short_description: "Run the Harness DDD/TDD/audit workflow in Codex."
+  default_prompt: "Use harness-run to execute the full 9-step DDD/TDD/audit workflow for this task."
